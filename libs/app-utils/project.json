@@ -1,0 +1,34 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/app-utils/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/app-utils/**/*.js"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/app-utils"],
+      "options": {
+        "jestConfig": "libs/app-utils/jest.config.js",
+        "passWithNoTests": true
+      }
+    },
+    "build": {
+      "executor": "@nrwl/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/app-utils",
+        "tsConfig": "libs/app-utils/tsconfig.lib.json",
+        "packageJson": "libs/app-utils/package.json",
+        "main": "libs/app-utils/src/index.js",
+        "assets": ["libs/app-utils/*.md"]
+      }
+    }
+  },
+  "tags": []
+}

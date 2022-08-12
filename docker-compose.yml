@@ -1,0 +1,131 @@
+version: '3.8'
+
+networks:
+  rafat97__network_public:
+    name: rafat97__network_public
+
+volumes:
+  mongo-db-volume:
+  kafka_data:
+  redis_data:
+  zookeeper_data:
+
+services:
+  mongo-db:
+    image: mongo:latest
+    restart: always
+    ports:
+      - 27017:27017
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=example
+    volumes:
+      - mongo-db-volume:/data/db
+    networks:
+      - rafat97__network_public
+
+  mangement-mongo:
+    image: mongo-express
+    restart: always
+    depends_on:
+      - mongo-db
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_SERVER: mongo-db
+    networks:
+      - rafat97__network_public
+
+  redis:
+    image: bitnami/redis:latest
+    restart: always
+    environment:
+      # ALLOW_EMPTY_PASSWORD is recommended only for development.
+      - ALLOW_EMPTY_PASSWORD=yes
+      - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
+    ports:
+      - '6379:6379'
+    volumes:
+      - 'redis_data:/bitnami/redis/data'
+    networks:
+      - rafat97__network_public
+
+  zoo1:
+    image: confluentinc/cp-zookeeper:latest
+    restart: always
+    ports:
+      - '2181:2181'
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_SERVERS: zoo1:2888:3888
+    networks:
+      - rafat97__network_public
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    restart: always
+    ports:
+      - '9092:9092'
+      - '29092:29092'
+      - '9999:9999'
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:19092,EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9092,DOCKER://host.docker.internal:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,DOCKER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_ZOOKEEPER_CONNECT: 'zoo1:2181'
+      KAFKA_BROKER_ID: 1
+      KAFKA_LOG4J_LOGGERS: 'kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_JMX_PORT: 9999
+      KAFKA_JMX_HOSTNAME: ${DOCKER_HOST_IP:-127.0.0.1}
+      KAFKA_AUTHORIZER_CLASS_NAME: kafka.security.authorizer.AclAuthorizer
+      KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND: 'true'
+    depends_on:
+      - zoo1
+    networks:
+      - rafat97__network_public
+
+  user-app:
+    depends_on:
+      - mongo-db
+      - kafka
+      - redis
+    build:
+      context: .
+      dockerfile: ./apps/user/Dockerfile.NX.DEV
+    image: 'tier5rafat/user-app:v1'
+    restart: always
+    environment:
+      - 'APP_PORT=9000'
+    ports:
+      - '9000:9000'
+    volumes:
+      - ./:/usr/src/app
+      - /usr/src/app/node_modules
+    networks:
+      - rafat97__network_public
+
+  user-consumer:
+    depends_on:
+      - mongo-db
+      - kafka
+      - redis
+    build:
+      context: .
+      dockerfile: ./apps/user-create-consumer/Dockerfile.NX.DEV
+    image: 'tier5rafat/user-consumer-app:v1'
+    restart: always
+    environment:
+      - 'APP_PORT=9000'
+    ports:
+      - '9050:9000'
+    volumes:
+      - ./:/usr/src/app
+      - /usr/src/app/node_modules
+    networks:
+      - rafat97__network_public

@@ -1,0 +1,14 @@
+{
+  "$schema": "./node_modules/nx/schemas/workspace-schema.json",
+  "version": 2,
+  "projects": {
+    "api-interfaces": "libs/api-interfaces",
+    "app-event": "libs/app-event",
+    "app-models": "libs/app-models",
+    "app-utils": "libs/app-utils",
+    "user": "apps/user",
+    "user-create-consumer": "apps/user-create-consumer",
+    "web-ui": "apps/web-ui",
+    "web-ui-e2e": "apps/web-ui-e2e"
+  }
+}

@@ -1,0 +1,14 @@
+FROM node:lts-alpine
+
+RUN apk add --no-cache libc6-compat
+WORKDIR /usr/src/app
+COPY ./package.json /usr/src/app
+RUN yarn install --frozen-lockfile
+
+ENV APP_MONGODB_CONNECTION_STRING "mongodb://root:example@mongo-db:27017/user?authSource=admin&retryWrites=true&w=majority"
+ENV APP_KAFKA_BROKER "kafka:19092"
+ENV APP_REDIS_CONNECTION_STRING "redis://:@redis:6379"
+ENV APP_PORT 8000
+EXPOSE ${APP_PORT}
+
+CMD  yarn start user
