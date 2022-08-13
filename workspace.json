@@ -3,11 +3,14 @@
   "version": 2,
   "projects": {
     "api-interfaces": "libs/api-interfaces",
+    "app-config": "libs/app-config",
     "app-event": "libs/app-event",
+    "app-input-validator": "libs/app-input-validator",
     "app-models": "libs/app-models",
     "app-utils": "libs/app-utils",
     "user": "apps/user",
     "user-create-consumer": "apps/user-create-consumer",
+    "user-realtime": "apps/user-realtime",
     "web-ui": "apps/web-ui",
     "web-ui-e2e": "apps/web-ui-e2e"
   }

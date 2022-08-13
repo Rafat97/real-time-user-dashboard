@@ -90,42 +90,80 @@ services:
     networks:
       - rafat97__network_public
 
-  user-app:
-    depends_on:
-      - mongo-db
-      - kafka
-      - redis
-    build:
-      context: .
-      dockerfile: ./apps/user/Dockerfile.NX.DEV
-    image: 'tier5rafat/user-app:v1'
-    restart: always
-    environment:
-      - 'APP_PORT=9000'
-    ports:
-      - '9000:9000'
-    volumes:
-      - ./:/usr/src/app
-      - /usr/src/app/node_modules
-    networks:
-      - rafat97__network_public
+  # user-app:
+  #   depends_on:
+  #     - mongo-db
+  #     - kafka
+  #     - redis
+  #   build:
+  #     context: .
+  #     dockerfile: ./Dockerfile.NX.DEV
+  #   entrypoint:
+  #     - user
+  #   image: 'tier5rafat/user-app:v1'
+  #   restart: always
+  #   environment:
+  #     - 'APP_PORT=9000'
+  #   ports:
+  #     - '9000:9000'
+  #   volumes:
+  #     - ./:/usr/src/app
+  #     - /usr/src/app/node_modules
+  #   networks:
+  #     - rafat97__network_public
 
-  user-consumer:
-    depends_on:
-      - mongo-db
-      - kafka
-      - redis
-    build:
-      context: .
-      dockerfile: ./apps/user-create-consumer/Dockerfile.NX.DEV
-    image: 'tier5rafat/user-consumer-app:v1'
-    restart: always
-    environment:
-      - 'APP_PORT=9000'
-    ports:
-      - '9050:9000'
-    volumes:
-      - ./:/usr/src/app
-      - /usr/src/app/node_modules
-    networks:
-      - rafat97__network_public
+  # user-consumer:
+  #   depends_on:
+  #     - mongo-db
+  #     - kafka
+  #     - redis
+  #   build:
+  #     context: .
+  #     dockerfile: ./apps/user-create-consumer/Dockerfile.NX.DEV
+  #   image: 'tier5rafat/user-consumer-app:v1'
+  #   restart: always
+  #   environment:
+  #     - 'APP_PORT=9000'
+  #   ports:
+  #     - '9050:9000'
+  #   volumes:
+  #     - ./:/usr/src/app
+  #     - /usr/src/app/node_modules
+  #   networks:
+  #     - rafat97__network_public
+
+  # user-realtime:
+  #   depends_on:
+  #     - user-consumer
+  #     - user-app
+  #   build:
+  #     context: .
+  #     dockerfile: ./apps/user-realtime/Dockerfile.NX.DEV
+  #   image: 'tier5rafat/user-realtime-app:v1'
+  #   restart: always
+  #   environment:
+  #     - 'APP_PORT=9000'
+  #   ports:
+  #     - '8050:9000'
+  #   volumes:
+  #     - ./:/usr/src/app
+  #     - /usr/src/app/node_modules
+  #   networks:
+  #     - rafat97__network_public
+
+  # web-ui:
+  #   depends_on:
+  #     - user-app
+  #     - user-realtime
+  #   build:
+  #     context: .
+  #     dockerfile: ./apps/web-ui/Dockerfile.NX.DEV
+  #   image: 'tier5rafat/web-ui-app:v1'
+  #   restart: always
+  #   ports:
+  #     - '8000:4200'
+  #   volumes:
+  #     - ./:/usr/src/app
+  #     - /usr/src/app/node_modules
+  #   networks:
+  #     - rafat97__network_public

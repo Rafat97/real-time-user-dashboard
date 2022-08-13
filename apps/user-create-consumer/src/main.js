@@ -3,26 +3,22 @@ import {
   redisConnectionCheck,
   createKafkaConsumer,
   createKafkaProducerSend,
+  createKafkaAdminTopic,
 } from '@myapp/utils';
 import { USER_EVENT } from '@myapp/event';
-import { createRandomUser } from './functions/createUser';
+import { createRandomUser } from '@myapp/app-models';
+import { appConfig } from '@myapp/app-config';
 
-const APP_MONGODB_CONNECTION_STRING =
-  process.env.APP_MONGODB_CONNECTION_STRING || 'mongodb://localhost:27017/test';
-const APP_REDIS_CONNECTION_STRING =
-  process.env.APP_REDIS_CONNECTION_STRING || 'redis://:@127.0.0.1:6379';
-const APP_KAFKA_BROKER = (
-  process.env.APP_KAFKA_BROKER || '127.0.0.1:9092'
-).split(',');
+const appConfigValues = appConfig();
 
 const kafkaClientConfig = {
-  brokers: [...APP_KAFKA_BROKER],
+  brokers: [...appConfigValues.kafka.brokers],
   requestTimeout: 10000,
   enforceRequestTimeout: true,
   connectionTimeout: 10000,
 };
 const redisConfig = {
-  url: APP_REDIS_CONNECTION_STRING,
+  url: appConfigValues.redis.APP_REDIS_CONNECTION_STRING,
 };
 
 const kafkaConsumerGroupId = 'user-consumer-create';
@@ -37,8 +33,6 @@ const kafkaConsumerRun = {
       `start ---> [${topic}] [${partition}] [${message.value?.toString()}]`
     );
     try {
-      // console.log(topic);
-      // console.log(partition);
       if (topic === USER_EVENT.USER_CREATE_BULK_RANDOMUSERS) {
         const stringToObject = JSON.parse(message.value?.toString());
         createRandomUser(stringToObject);
@@ -63,8 +57,28 @@ const messagePing = [
 ];
 
 const init = async () => {
-  await mongoDBConnectionCheckSync(APP_MONGODB_CONNECTION_STRING);
+  await mongoDBConnectionCheckSync(appConfigValues.mongodb.connectionString);
   await redisConnectionCheck(redisConfig);
+
+  // topic created
+  for (let data in USER_EVENT) {
+    const topicName = USER_EVENT[data];
+    if (topicName == USER_EVENT.USER_ALL_EVENTS) {
+      continue;
+    }
+    console.log(topicName);
+    await createKafkaAdminTopic(kafkaClientConfig, {
+      // validateOnly: true,
+      waitForLeaders: true,
+      topics: [
+        {
+          topic: topicName,
+          numPartitions: 1,
+          replicationFactor: 1,
+        },
+      ],
+    });
+  }
 
   await createKafkaProducerSend(kafkaClientConfig, {
     topic: USER_EVENT.USER_CONSUMER_PING,

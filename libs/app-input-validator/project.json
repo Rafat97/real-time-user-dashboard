@@ -1,0 +1,34 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/app-input-validator/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/app-input-validator/**/*.js"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/app-input-validator"],
+      "options": {
+        "jestConfig": "libs/app-input-validator/jest.config.js",
+        "passWithNoTests": true
+      }
+    },
+    "build": {
+      "executor": "@nrwl/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/app-input-validator",
+        "tsConfig": "libs/app-input-validator/tsconfig.lib.json",
+        "packageJson": "libs/app-input-validator/package.json",
+        "main": "libs/app-input-validator/src/index.js",
+        "assets": ["libs/app-input-validator/*.md"]
+      }
+    }
+  },
+  "tags": []
+}

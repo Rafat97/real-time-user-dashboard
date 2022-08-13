@@ -12,4 +12,4 @@ ENV APP_DEPLOY_TYPE "docker"
 ENV APP_PORT 8000
 EXPOSE ${APP_PORT}
 
-CMD  yarn start user-create-consumer
+CMD  yarn start user-realtime

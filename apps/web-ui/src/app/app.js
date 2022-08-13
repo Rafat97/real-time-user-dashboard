@@ -3,8 +3,40 @@ import { Route, Routes, Link } from 'react-router-dom';
 import { Button } from '@mantine/core';
 import { NavbarSimple } from './components/Navbar/index.component';
 import { TableSelection } from './components/Table/index.component';
+import { MDrawer } from './components/Drawer/index.component';
+import io from 'socket.io-client';
+import { useState, useEffect } from 'react';
+
+const socket = io("ws://localhost:8000");
 
 export function App() {
+  const [isConnected, setIsConnected] = useState(socket.connected);
+  const [lastPong, setLastPong] = useState(null);
+
+  useEffect(() => {
+    socket.on('connect', () => {
+      setIsConnected(true);
+    });
+
+    socket.on('disconnect', () => {
+      setIsConnected(false);
+    });
+
+    socket.on('pong', () => {
+      setLastPong(new Date().toISOString());
+    });
+
+    return () => {
+      socket.off('connect');
+      socket.off('disconnect');
+      socket.off('pong');
+    };
+  }, []);
+
+  const sendPing = () => {
+    socket.emit('ping');
+  };
+
   return (
     <>
       <div
@@ -21,7 +53,7 @@ export function App() {
             path="/"
             element={
               <div>
-                <TableSelection data={[]} />
+                <div>asdasd</div>
               </div>
             }
           />
@@ -29,7 +61,15 @@ export function App() {
             path="/users"
             element={
               <div>
-                <Link to="/">Click here to go back to root page.</Link>
+                <div>
+                  <div>
+                    <p>Connected: {'' + isConnected}</p>
+                    <p>Last pong: {lastPong || '-'}</p>
+                    <button onClick={sendPing}>Send ping</button>
+                  </div>
+                  <TableSelection data={[]} />
+                  <MDrawer />
+                </div>
               </div>
             }
           />

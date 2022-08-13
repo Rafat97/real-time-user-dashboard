@@ -1,5 +1,4 @@
 import { ExpressApplicationRouter } from '@rafat97/express-made-easy';
-
 import { createKafkaProducerSend, mongoDBStatusCheck } from '@myapp/utils';
 import { USER_EVENT } from '@myapp/event';
 
@@ -19,7 +18,6 @@ const generateUserRoutes = new ExpressApplicationRouter();
 generateUserRoutes.getMethod('/random/:id', async (req, res) => {
   console.log(mongoDBStatusCheck());
   const { id } = req.params;
-  console.log(req);
   const totalUser = id;
   const message = [
     {

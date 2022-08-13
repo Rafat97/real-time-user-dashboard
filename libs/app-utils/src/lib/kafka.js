@@ -43,3 +43,12 @@ export const createKafkaConsumer = async (
   await consumer.run({ ...runOptions });
   return consumer;
 };
+
+export const createKafkaAdminTopic = async (kafkaClientOption, topicOption) => {
+  const kafka = createKafkaClient(kafkaClientOption);
+  const admin =  kafka.admin();
+  await admin.createTopics({
+    ...topicOption,
+  });
+  return admin;
+};

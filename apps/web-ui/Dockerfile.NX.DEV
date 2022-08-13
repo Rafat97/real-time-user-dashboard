@@ -1,0 +1,12 @@
+FROM node:lts-alpine
+
+RUN apk add --no-cache libc6-compat
+WORKDIR /usr/src/app
+COPY ./package.json /usr/src/app
+RUN yarn install --frozen-lockfile
+
+ENV APP_DEPLOY_TYPE "docker"
+ENV APP_PORT 8000
+EXPOSE ${APP_PORT}
+
+CMD  yarn start web-ui

@@ -16,6 +16,8 @@
     "baseUrl": ".",
     "paths": {
       "@app/api-interfaces": ["libs/api-interfaces/src/index.ts"],
+      "@myapp/app-config": ["libs/app-config/src/index.js"],
+      "@myapp/app-input-validator": ["libs/app-input-validator/src/index.js"],
       "@myapp/app-models": ["libs/app-models/src/index.js"],
       "@myapp/event": ["libs/app-event/src/index.js"],
       "@myapp/utils": ["libs/app-utils/src/index.js"]
