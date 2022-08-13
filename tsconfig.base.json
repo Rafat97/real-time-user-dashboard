@@ -20,6 +20,7 @@
       "@myapp/app-input-validator": ["libs/app-input-validator/src/index.js"],
       "@myapp/app-models": ["libs/app-models/src/index.js"],
       "@myapp/event": ["libs/app-event/src/index.js"],
+      "@myapp/user-api-sdk": ["libs/api-sdk/src/index.js"],
       "@myapp/utils": ["libs/app-utils/src/index.js"]
     }
   },

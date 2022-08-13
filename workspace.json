@@ -3,6 +3,7 @@
   "version": 2,
   "projects": {
     "api-interfaces": "libs/api-interfaces",
+    "api-sdk": "libs/api-sdk",
     "app-config": "libs/app-config",
     "app-event": "libs/app-event",
     "app-input-validator": "libs/app-input-validator",

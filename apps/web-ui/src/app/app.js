@@ -1,42 +1,11 @@
 import './app.scss';
-import { Route, Routes, Link } from 'react-router-dom';
-import { Button } from '@mantine/core';
+import { Route, Routes } from 'react-router-dom';
 import { NavbarSimple } from './components/Navbar/index.component';
-import { TableSelection } from './components/Table/index.component';
-import { MDrawer } from './components/Drawer/index.component';
-import io from 'socket.io-client';
-import { useState, useEffect } from 'react';
 
-const socket = io("ws://localhost:8000");
+import UserPage from './page/user.page';
+import DashboardPage from './page/dashboard.page';
 
 export function App() {
-  const [isConnected, setIsConnected] = useState(socket.connected);
-  const [lastPong, setLastPong] = useState(null);
-
-  useEffect(() => {
-    socket.on('connect', () => {
-      setIsConnected(true);
-    });
-
-    socket.on('disconnect', () => {
-      setIsConnected(false);
-    });
-
-    socket.on('pong', () => {
-      setLastPong(new Date().toISOString());
-    });
-
-    return () => {
-      socket.off('connect');
-      socket.off('disconnect');
-      socket.off('pong');
-    };
-  }, []);
-
-  const sendPing = () => {
-    socket.emit('ping');
-  };
-
   return (
     <>
       <div
@@ -49,28 +18,22 @@ export function App() {
           <NavbarSimple />
         </div>
         <Routes>
-          <Route
-            path="/"
-            element={
-              <div>
-                <div>asdasd</div>
-              </div>
-            }
-          />
+          <Route path="/" element={<DashboardPage />} />
           <Route
             path="/users"
             element={
-              <div>
-                <div>
-                  <div>
-                    <p>Connected: {'' + isConnected}</p>
-                    <p>Last pong: {lastPong || '-'}</p>
-                    <button onClick={sendPing}>Send ping</button>
-                  </div>
-                  <TableSelection data={[]} />
-                  <MDrawer />
-                </div>
-              </div>
+              <UserPage />
+              // <div>
+              //   <div>
+              //     <div>
+              //       <p>Connected: {'' + isConnected}</p>
+              //       <p>Last pong: {lastPong || '-'}</p>
+              //       <button onClick={sendPing}>Send ping</button>
+              //     </div>
+              //     <TableSelection data={[]} />
+              //     <MDrawer />
+              //   </div>
+              // </div>
             }
           />
         </Routes>

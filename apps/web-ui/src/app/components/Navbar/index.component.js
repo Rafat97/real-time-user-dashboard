@@ -1,14 +1,8 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createStyles, Navbar, Group, Code } from '@mantine/core';
-import {
-  IconUsers,
-  IconSwitchHorizontal,
-  IconLogout,
-  IconHome2,
-} from '@tabler/icons';
-import { MantineLogo } from '@mantine/ds';
-import { useNavigate } from 'react-router-dom';
+import { IconUsers, IconHome2 } from '@tabler/icons';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const useStyles = createStyles((theme, _params, getRef) => {
   const icon = getRef('icon');
@@ -94,14 +88,20 @@ const data = [
 ];
 
 export function NavbarSimple() {
-  const { classes, cx } = useStyles();
-  const [active, setActive] = useState('Dashboard');
   const navigate = useNavigate();
+  let location = useLocation();
+  const { classes, cx } = useStyles();
+  const [active, setActive] = useState(location.pathname);
+  console.log(location);
+
+  useEffect(() => {
+    setActive(location.pathname);
+  }, [location]);
 
   const links = data.map((item) => (
     <a
       className={cx(classes.link, {
-        [classes.linkActive]: item.label === active,
+        [classes.linkActive]: item.link === active,
       })}
       href={item.link}
       key={item.label}
