@@ -4,6 +4,7 @@ import {
   Group,
   Modal,
   NumberInput,
+  Select,
   TextInput,
 } from '@mantine/core';
 import { useState } from 'react';
@@ -15,6 +16,8 @@ import { createRandomUserApiCall } from '../../api/userCreateRandomUser';
 import { getAllUserApiCall } from '../../api/userGetAll';
 import { useQuery } from '@tanstack/react-query';
 import { createRealApiCall } from '../../api/userCreateRealUser';
+import { userDeleteApiCall } from '../../api/userDelete';
+import CountrySelect from '../../components/CountrySelect/index.component';
 
 const ModalGenerateUser = ({
   openedGenerateUser,
@@ -37,7 +40,7 @@ const ModalGenerateUser = ({
       title="Generate Random User"
       closeOnClickOutside={false}
     >
-      <form onSubmit={form.onSubmit((values) => onSubmitForm(values))}>
+      <form onSubmit={form.onSubmit((values) => onSubmitForm(values, form))}>
         <NumberInput
           label="How many user you want to generate?*"
           placeholder="1000"
@@ -60,14 +63,25 @@ const ModalCreateUser = ({
   setOpenedCreateUser,
   onSubmitForm,
   onSubmitLoading,
+  clearAllValue,
 }) => {
   const GenerateSchema = Yup.object().shape({
     name: Yup.string().required('Name is required'),
-    email: Yup.string().required('Email is required'),
+    email: Yup.string()
+      .required('Email is required')
+      .email('Invalid email address'),
     phoneNumber: Yup.string().required('Phone Number is required'),
+    gender: Yup.string().required('Gender is required'),
+    country: Yup.string().required('Country is required'),
   });
   const form = useForm({
-    initialValues: { name: '', email: '', phoneNumber: '' },
+    initialValues: {
+      name: '',
+      email: '',
+      phoneNumber: '',
+      gender: 'female',
+      country: 'Bangladesh',
+    },
     validate: yupResolver(GenerateSchema),
   });
   return (
@@ -78,26 +92,47 @@ const ModalCreateUser = ({
       title="Create User"
       closeOnClickOutside={false}
     >
-      <form onSubmit={form.onSubmit((values) => onSubmitForm(values))}>
+      <form onSubmit={form.onSubmit((values) => onSubmitForm(values, form))}>
         <TextInput
+          py={7}
           label="Name"
           placeholder="example name"
           disabled={onSubmitLoading}
           {...form.getInputProps('name')}
         />
         <TextInput
+          py={7}
           label="Email"
           placeholder="test@mail.com"
           disabled={onSubmitLoading}
           {...form.getInputProps('email')}
         />
         <TextInput
+          py={7}
           label="Phone Number"
           placeholder="+123456789"
           disabled={onSubmitLoading}
           {...form.getInputProps('phoneNumber')}
         />
 
+        <Select
+          py={7}
+          label="Select Your Gender"
+          defaultValue="female"
+          placeholder="Pick one"
+          data={[
+            { value: 'male', label: 'Male' },
+            { value: 'female', label: 'Female' },
+          ]}
+          {...form.getInputProps('gender')}
+        />
+
+        <CountrySelect
+          py={7}
+          label="Select Your Country"
+          defaultValue="Bangladesh"
+          {...form.getInputProps('country')}
+        />
         <Group position="right" mt="md">
           <Button disabled={onSubmitLoading} type="submit">
             Submit
@@ -129,7 +164,7 @@ export default function UserLayout() {
       keepPreviousData: true,
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
-      refetchInterval: 5000,
+      refetchInterval: 3000,
     }
   );
 
@@ -146,32 +181,45 @@ export default function UserLayout() {
     refetch();
   };
 
-  const createRandomUser = async (data) => {
+  const createRandomUser = async (data, form) => {
     setLoadingGenerateRandom(true);
     console.log(data);
     try {
       await createRandomUserApiCall(data.number);
       setOpenedGenerateUser(false);
       refetchData();
+      form.reset();
     } catch (error) {
       alert(error.message);
     }
     setLoadingGenerateRandom(false);
   };
 
-  const createNewUserSubmitForm = async (data) => {
+  const createNewUserSubmitForm = async (data, form) => {
     setLoadingCreateUser(true);
     console.log(data);
     try {
       await createRealApiCall(data);
       setOpenedCreateUser(false);
       refetchData();
+      form.reset();
     } catch (error) {
       alert(error.message);
     }
     setLoadingCreateUser(false);
   };
 
+  const onDeleteClick = async (id) => {
+    try {
+      const confirmation = window.confirm('Are you sure? ');
+      if (confirmation) {
+        await userDeleteApiCall(id);
+        refetchData();
+      }
+    } catch (error) {
+      alert(error.message);
+    }
+  };
   return (
     <>
       <ModalGenerateUser
@@ -197,7 +245,11 @@ export default function UserLayout() {
             </Button>
             <Button onClick={() => refetchData()}>Refresh</Button>
           </Group>
-          <TableLayout data={data?.data?.result || []} isLoading={isLoading} />
+          <TableLayout
+            data={data?.data?.result || []}
+            isLoading={isLoading}
+            onClickDelete={onDeleteClick}
+          />
         </div>
         <Group style={{ margin: '10px 0' }} position="center">
           <Button

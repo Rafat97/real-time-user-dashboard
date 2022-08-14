@@ -99,8 +99,11 @@ export const createRandomUser = async (message) => {
 };
 
 export const createUser = async (message) => {
-  let doc = await UserModel.create(message);
+  const uid = ulid();
+  const data = { ...message, lastActive: Date.now(), userName: uid };
+  let doc = await UserModel.create(data);
   console.log(doc);
+  return doc;
 };
 
 export const updateUserInfo = async (id, body) => {

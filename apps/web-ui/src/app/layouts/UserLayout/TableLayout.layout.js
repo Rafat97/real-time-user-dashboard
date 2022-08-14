@@ -3,7 +3,6 @@ import { formatDistance, subDays } from 'date-fns';
 import {
   createStyles,
   Table,
-  Checkbox,
   ScrollArea,
   Group,
   Avatar,
@@ -11,6 +10,7 @@ import {
   Skeleton,
 } from '@mantine/core';
 import uniqueid from 'lodash/uniqueid';
+import { IconArchive } from '@tabler/icons';
 
 const useStyles = createStyles((theme) => ({
   rowSelected: {
@@ -21,7 +21,7 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-export default function TableLayout({ data, isLoading }) {
+export default function TableLayout({ data, isLoading, onClickDelete }) {
   const { classes, cx } = useStyles();
 
   const rowsLoading = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((item) => {
@@ -48,15 +48,20 @@ export default function TableLayout({ data, isLoading }) {
         <td>{item.userName}</td>
         <td>{item.email}</td>
         <td>{item.phoneNumber}</td>
+        <td>{item.gender}</td>
+        <td>{item.country}</td>
         <td>
           {formatDistance(new Date(item.lastActive), new Date(), {
             addSuffix: true,
           })}
         </td>
         <td>
-          {formatDistance(new Date(item.createdAt), new Date(), {
-            addSuffix: true,
-          })}
+          <div
+            style={{ cursor: 'pointer' }}
+            onClick={() => onClickDelete(item._id)}
+          >
+            <IconArchive size={24} />
+          </div>
         </td>
       </tr>
     );
@@ -74,8 +79,10 @@ export default function TableLayout({ data, isLoading }) {
       <th>User Name</th>
       <th>Email</th>
       <th>Phone Number</th>
+      <th>Gender</th>
+      <th>Country</th>
       <th>Last Active</th>
-      <th>Created At</th>
+      <th></th>
     </tr>
   );
 
