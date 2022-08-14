@@ -1,6 +1,8 @@
 import axios from 'axios';
 export const getTotalUserCounter = async () => {
-  let url = 'http://localhost:9000/v1/user/admin/count';
+  let url = `${
+    process.env.API_USER_URL || `http://localhost:9000`
+  }/v1/user/admin/count`;
   const config = {
     method: 'get',
     url: url,

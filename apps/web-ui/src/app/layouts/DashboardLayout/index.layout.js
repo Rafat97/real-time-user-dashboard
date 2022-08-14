@@ -1,26 +1,56 @@
 import style from './index.module.scss';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import {
-  Center,
+  Avatar,
+  Card,
   Container,
   Grid,
-  Paper,
-  RingProgress,
-  SimpleGrid,
-  Skeleton,
+  Group,
+  Stack,
   Text,
-  Title,
-  useMantineTheme,
 } from '@mantine/core';
-import { IconArrowUpRight } from '@tabler/icons';
+import { IconUsers } from '@tabler/icons';
 import { useQuery } from '@tanstack/react-query';
 import { getTotalUserCounter } from '../../api/userCounter';
-
+import { useListState } from '@mantine/hooks';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import uniqueid from 'lodash/uniqueid';
 const PRIMARY_COL_HEIGHT = 300;
 
+const UserCountLayout = ({ text, count }) => {
+  return (
+    <Card shadow="sm" p="lg" radius="md" withBorder>
+      {/* <Card.Section></Card.Section> */}
+      <Grid align="start">
+        <Grid.Col md={6} span={3}>
+          <Stack>
+            <div>
+              <Text weight={700} size="xl" align="left">
+                {text}
+              </Text>
+            </div>
+            <div>
+              <Text weight={700} size="xl" align="left">
+                {count}
+              </Text>
+            </div>
+          </Stack>
+        </Grid.Col>
+        <Grid.Col md={6} span={3}>
+          <Group position="right">
+            <div>
+              <Avatar size="lg" color="blue" radius="xl">
+                <IconUsers size={30} />
+              </Avatar>
+            </div>
+          </Group>
+        </Grid.Col>
+      </Grid>
+    </Card>
+  );
+};
+
 export default function DashboardLayout() {
-  const theme = useMantineTheme();
-  const SECONDARY_COL_HEIGHT = PRIMARY_COL_HEIGHT / 2 - theme.spacing.md / 2;
   const { isLoading, error, data } = useQuery(
     ['userCounter'],
     getTotalUserCounter,
@@ -29,71 +59,71 @@ export default function DashboardLayout() {
     }
   );
 
-  if (isLoading) return 'Loading...';
+  const [state, handlers] = useListState([
+    {
+      symbol: uniqueid('DashboardLayout_'),
+      componentType: 'USER_COUNTER',
+    },
+    {
+      symbol: uniqueid('DashboardLayout_'),
+      componentType: 'USER_COUNTER',
+    },
+    {
+      symbol: uniqueid('DashboardLayout_'),
+      componentType: 'USER_COUNTER',
+    },
+  ]);
 
-  if (error) return 'An error has occurred: ' + error.message;
+  const onHandleOnDragEnd = (data) => {
+    console.log(data);
+    return handlers.reorder({
+      from: data.source.index,
+      to: data.destination?.index || 0,
+    });
+  };
+
+  useEffect(() => {
+    console.log(state);
+  }, [state]);
+
+  const items = state.map((item, index) => (
+    <Draggable key={item.symbol} index={index} draggableId={item.symbol}>
+      {(provided) => (
+        <Grid.Col
+          md={4}
+          span={5}
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+        >
+          {item.componentType === 'USER_COUNTER' && (
+            <UserCountLayout
+              text={`Total Users `}
+              count={data?.countInternationalSystem || 0}
+            />
+          )}
+        </Grid.Col>
+      )}
+    </Draggable>
+  ));
 
   return (
     <div className={style.container}>
-      <Container my="md">
-        <SimpleGrid
-          cols={2}
-          spacing="md"
-          breakpoints={[{ maxWidth: 'sm', cols: 1 }]}
-        >
-          <Paper
-            style={{ padding: '0 0 10px 0' }}
-            withBorder
-            height={PRIMARY_COL_HEIGHT}
-          >
-            <Center>
-              <SimpleGrid cols={1}>
-                <RingProgress
-                  size={200}
-                  roundCaps
-                  thickness={9}
-                  sections={[{ color: `green` }]}
-                  label={
-                    <Center>
-                      <IconArrowUpRight size={22} stroke={1.5} />
-                    </Center>
-                  }
-                />
-                <Center>
-                  <Text weight={700} size="xl" align="center">
-                    {data.countInternationalSystem}
-                  </Text>
-                </Center>
-                <Center>
-                  <Title order={4}>Total User Count</Title>
-                </Center>
-              </SimpleGrid>
-            </Center>
-          </Paper>
-          <Grid gutter="md">
-            <Grid.Col>
-              <Skeleton
-                height={SECONDARY_COL_HEIGHT}
-                radius="md"
-                animate={false}
-              />
-            </Grid.Col>
-            <Grid.Col span={6}>
-              <Skeleton
-                height={SECONDARY_COL_HEIGHT}
-                radius="md"
-                animate={false}
-              />
-            </Grid.Col>
-            <Grid.Col span={6}>
-              <Skeleton
-                height={SECONDARY_COL_HEIGHT}
-                radius="md"
-                animate={false}
-              />
-            </Grid.Col>
-          </Grid>
-        </SimpleGrid>
+      <Container>
+        <DragDropContext onDragEnd={(data) => onHandleOnDragEnd(data)}>
+          <Droppable droppableId="dnd-draggable" direction="horizontal">
+            {(provided) => (
+              <Grid
+                mt={50}
+                {...provided.droppableProps}
+                ref={provided.innerRef}
+              >
+                {items}
+                {provided.placeholder}
+              </Grid>
+            )}
+          </Droppable>
+        </DragDropContext>
       </Container>
     </div>
   );

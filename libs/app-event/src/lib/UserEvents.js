@@ -5,5 +5,6 @@ export const USER_EVENT = {
   USER_CREATED_SINGLE: 'user.created.single',
   USER_DELETED_SINGLE: 'user.deleted.single',
   USER_UPDATED_SINGLE: 'user.updated.single',
+  USER_ACTIVATE_CREATE: 'user.activate.create',
   USER_CREATE_BULK_RANDOMUSERS: 'user.create.bulk.randomusers',
 };

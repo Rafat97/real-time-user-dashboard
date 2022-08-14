@@ -4,6 +4,7 @@ import { allRequestHandler } from './utils/allRequestHandler';
 import { healthRoutes } from './routes/health';
 import { errorHandler } from './utils/demoErrorHandler';
 import { generateUserRoutes } from './routes/generateUser';
+
 import {
   createKafkaProducerConnection,
   mongoDBConnectionCheck,
@@ -11,6 +12,7 @@ import {
 } from '@myapp/utils';
 import { userRoutes } from './routes/user';
 import { appConfig } from '@myapp/app-config';
+import { userDeviceMiddleWare } from './middleware/userDevice';
 const appConfigValues = appConfig();
 
 const config = {
@@ -31,6 +33,7 @@ mongoDBConnectionCheck(
     await createKafkaProducerConnection(kafkaClientConfig);
     await redisConnectionCheck(redisConfig);
     expressApp
+      .addMiddleware(userDeviceMiddleWare)
       .router('/v1/generate/users', generateUserRoutes)
       .router('/v1/user', userRoutes)
       .router('/v1/health', healthRoutes)

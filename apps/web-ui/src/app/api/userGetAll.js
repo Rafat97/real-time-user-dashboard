@@ -2,7 +2,7 @@ import axios from 'axios';
 
 export const getAllUserApiCall = async (options) => {
   try {
-    let url = 'http://localhost:9000/v1/user?';
+    let url = `${process.env.API_USER_URL || `http://localhost:9000`}/v1/user?`;
     for (const key in options) {
       const element = options[key];
       url += `${key}=${element}&`;
@@ -18,4 +18,5 @@ export const getAllUserApiCall = async (options) => {
   } catch (error) {
     alert(error.message);
   }
+  return [];
 };

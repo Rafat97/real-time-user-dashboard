@@ -10,8 +10,9 @@ const UserInputValidationSchema = {
     email: { type: 'string', format: 'email' },
     name: { type: 'string' },
     phoneNumber: { type: 'string' },
+    gender: { type: 'string' },
   },
-  required: ['email', 'name', 'phoneNumber'],
+  required: ['email', 'name', 'phoneNumber', 'gender'],
 };
 
 const validate = ajv.compile(UserInputValidationSchema);

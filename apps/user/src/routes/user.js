@@ -2,7 +2,7 @@ import { ExpressApplicationRouter } from '@rafat97/express-made-easy';
 import { createKafkaProducerSend } from '@myapp/utils';
 import { USER_EVENT } from '@myapp/event';
 import { BadRequestValidation } from '@rafat97/exceptionhandler';
-import { UserModel } from '@myapp/app-models';
+import { createUser, updateUserInfo, UserModel } from '@myapp/app-models';
 import { appConfig } from '@myapp/app-config';
 import { convertToInternationalCurrencySystem } from '@myapp/utils';
 import { radiusCacheHandler } from '../utils/radisHandler';
@@ -89,7 +89,7 @@ userRoutes.postMethod('/', inputValidation, async (req, res) => {
   if (getUserEmail) {
     throw new Error('User already Exist');
   }
-  const userCreate = await UserModel.create({ ...body });
+  const userCreate = await createUser({ ...body });
 
   await createKafkaProducerSend(kafkaClientConfig, {
     topic: USER_EVENT.USER_CREATED_SINGLE,
@@ -111,16 +111,33 @@ userRoutes.postMethod('/', inputValidation, async (req, res) => {
   });
 });
 
+// create Activity
+userRoutes.getMethod('/activity/:id', async (req, res) => {
+  await createKafkaProducerSend(kafkaClientConfig, {
+    topic: USER_EVENT.USER_ACTIVATE_CREATE,
+    messages: [
+      {
+        value: JSON.stringify({
+          body: {
+            user: req.params.id,
+            device: { ...req.device },
+            requestTime: Date.now(),
+          },
+          message: USER_EVENT.USER_UPDATED_SINGLE,
+          createAt: Date.now(),
+        }),
+      },
+    ],
+  });
+
+  res.status(200).send({
+    result: 'ok',
+  });
+});
+
 // update user by id
 userRoutes.postMethod('/:id', async (req, res) => {
-  const userUpdate = await UserModel.findByIdAndUpdate(
-    req.params.id,
-    req.body,
-    {
-      new: true,
-      runValidators: true,
-    }
-  );
+  const userUpdate = await updateUserInfo(req.params.id, req.body);
 
   if (!userUpdate) {
     throw new BadRequestValidation('User not found');

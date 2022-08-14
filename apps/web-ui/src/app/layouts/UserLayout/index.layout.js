@@ -1,26 +1,20 @@
 import {
   Button,
-  Checkbox,
   Container,
-  Grid,
   Group,
-  LoadingOverlay,
   Modal,
   NumberInput,
-  Skeleton,
   TextInput,
 } from '@mantine/core';
 import { useState } from 'react';
-import LoadingComponent from '../../components/Loading/index.component';
 import TableLayout from './TableLayout.layout';
-import useGetAllUsers from '../../hooks/use-get-user';
-import style from './index.module.scss';
-// import { useForm } from 'react-hook-form';
+
 import * as Yup from 'yup';
 import { useForm, yupResolver } from '@mantine/form';
 import { createRandomUserApiCall } from '../../api/userCreateRandomUser';
 import { getAllUserApiCall } from '../../api/userGetAll';
 import { useQuery } from '@tanstack/react-query';
+import { createRealApiCall } from '../../api/userCreateRealUser';
 
 const ModalGenerateUser = ({
   openedGenerateUser,
@@ -120,10 +114,24 @@ export default function UserLayout() {
     page: 1,
   });
 
-  const { isLoading, isError, error, data, isFetching, isPreviousData } =
-    useQuery(['users', pathParam], () => getAllUserApiCall({ ...pathParam }), {
+  const {
+    isLoading,
+    isError,
+    error,
+    data,
+    isFetching,
+    isPreviousData,
+    refetch,
+  } = useQuery(
+    ['users', pathParam],
+    () => getAllUserApiCall({ ...pathParam }),
+    {
       keepPreviousData: true,
-    });
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      refetchInterval: 5000,
+    }
+  );
 
   // const [isLoading, isError, errorMessage, userData] =
   //   useGetAllUsers(pathParam,);
@@ -134,12 +142,17 @@ export default function UserLayout() {
   const [openedCreateUser, setOpenedCreateUser] = useState(false);
   const [loadingCreateUser, setLoadingCreateUser] = useState(false);
 
+  const refetchData = () => {
+    refetch();
+  };
+
   const createRandomUser = async (data) => {
     setLoadingGenerateRandom(true);
     console.log(data);
     try {
       await createRandomUserApiCall(data.number);
       setOpenedGenerateUser(false);
+      refetchData();
     } catch (error) {
       alert(error.message);
     }
@@ -150,11 +163,13 @@ export default function UserLayout() {
     setLoadingCreateUser(true);
     console.log(data);
     try {
-      // setOpenedGenerateUser(false);
+      await createRealApiCall(data);
+      setOpenedCreateUser(false);
+      refetchData();
     } catch (error) {
       alert(error.message);
     }
-    // setLoadingCreateUser(false);
+    setLoadingCreateUser(false);
   };
 
   return (
@@ -180,12 +195,13 @@ export default function UserLayout() {
             <Button onClick={() => setOpenedCreateUser(true)}>
               Add a New User
             </Button>
+            <Button onClick={() => refetchData()}>Refresh</Button>
           </Group>
           <TableLayout data={data?.data?.result || []} isLoading={isLoading} />
         </div>
         <Group style={{ margin: '10px 0' }} position="center">
           <Button
-            disabled={pathParam.page < 1 ? true : false}
+            disabled={pathParam.page <= 1 ? true : false}
             onClick={() =>
               setPathParam({ ...pathParam, page: pathParam.page - 1 })
             }
@@ -193,6 +209,9 @@ export default function UserLayout() {
             Previous Page
           </Button>
           <Button
+            disabled={
+              (data?.data?.result || []).length < pathParam.limit ? true : false
+            }
             onClick={() =>
               setPathParam({ ...pathParam, page: pathParam.page + 1 })
             }

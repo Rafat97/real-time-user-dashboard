@@ -2,6 +2,8 @@ import mongoose from 'mongoose';
 import { faker } from '@faker-js/faker';
 import { ulid } from 'ulid';
 
+export const UserModelRef = 'User';
+
 const UserSchema = new mongoose.Schema(
   {
     email: {
@@ -16,6 +18,15 @@ const UserSchema = new mongoose.Schema(
       index: true,
     },
     phoneNumber: {
+      type: String,
+      required: true,
+      index: true,
+    },
+    country: {
+      type: String,
+      index: true,
+    },
+    gender: {
       type: String,
       required: true,
       index: true,
@@ -39,9 +50,13 @@ const UserSchema = new mongoose.Schema(
 );
 UserSchema.index({ createdAt: 1 });
 UserSchema.index({ updatedAt: 1 });
-export const UserModel = mongoose.model('User', UserSchema);
+UserSchema.index({ '$**': 'text' });
+export const UserModel = mongoose.model(UserModelRef, UserSchema);
 
 export const createRandomUser = async (message) => {
+  function getRandomInt(max) {
+    return Math.floor(Math.random() * max);
+  }
   try {
     const totalUser = message.totalUserCreate || 1;
     let counter = totalUser;
@@ -54,14 +69,22 @@ export const createRandomUser = async (message) => {
       }
       for (let index2 = 0; index2 < currentCounter; index2++) {
         uniqueCounter += 1;
-        const name = faker.name.fullName();
+        const uid = ulid();
+        const genderArray = ['male', 'female'];
+        const gender = genderArray[getRandomInt(2)];
+        const name = faker.name.fullName({ sex: gender });
         const email = `${Date.now()}_random_${uniqueCounter}@test.com`;
         const phoneNumber = faker.phone.number();
+        const country = faker.address.country();
+
         const userData = {
-          name,
           email,
+          name,
           phoneNumber,
-          test: email,
+          country,
+          gender,
+          userName: uid,
+          lastActive: Date.now(),
         };
         userAdd.push(userData);
       }
@@ -76,12 +99,14 @@ export const createRandomUser = async (message) => {
 };
 
 export const createUser = async (message) => {
-  try {
-    let doc = await UserModel.create(message);
-    console.log(doc);
-  } catch (error) {
-    console.log('-----------------createUser------------');
-    console.log(error);
-    console.log('-----------------createUser------------');
-  }
+  let doc = await UserModel.create(message);
+  console.log(doc);
+};
+
+export const updateUserInfo = async (id, body) => {
+  const userUpdate = await UserModel.findByIdAndUpdate(id, body, {
+    new: true,
+    runValidators: true,
+  });
+  return userUpdate;
 };
