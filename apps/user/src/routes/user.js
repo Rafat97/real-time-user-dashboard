@@ -2,7 +2,12 @@ import { ExpressApplicationRouter } from '@rafat97/express-made-easy';
 import { createKafkaProducerSend } from '@myapp/utils';
 import { USER_EVENT } from '@myapp/event';
 import { BadRequestValidation } from '@rafat97/exceptionhandler';
-import { createUser, updateUserInfo, UserModel } from '@myapp/app-models';
+import {
+  createUser,
+  updateUserInfo,
+  UserActivityModel,
+  UserModel,
+} from '@myapp/app-models';
 import { appConfig } from '@myapp/app-config';
 import { convertToInternationalCurrencySystem } from '@myapp/utils';
 import { radiusCacheHandler } from '../utils/radisHandler';
@@ -189,6 +194,165 @@ userRoutes.deleteMethod('/:id', async (req, res) => {
 
   res.status(200).send({
     message: 'delete successfully',
+  });
+});
+
+// get aggregation by country
+userRoutes.getMethod('/agg/all/:fieldName', async (req, res) => {
+  const { fieldName } = req.params;
+  const agg = await UserModel.aggregate([
+    {
+      $group: {
+        _id: `$${fieldName}`,
+        sum: { $sum: 1 },
+      },
+    },
+    { $sort: { sum: -1 } },
+    { $count: 'sum' },
+  ]);
+
+  res.status(200).send({
+    result: {
+      allCountry: agg[0].sum,
+    },
+  });
+});
+
+// get aggregation by country
+userRoutes.getMethod('/agg/country', async (req, res) => {
+  const cacheKey = hash({
+    url: req.originalUrl,
+  });
+  const cacheTime = 10;
+  const returnData = await radiusCacheHandler(cacheKey, cacheTime, async () => {
+    const agg = await UserModel.aggregate([
+      {
+        $group: {
+          _id: `$country`,
+          sum: { $count: {} },
+        },
+      },
+      { $limit: 15 },
+      { $sort: { sum: -1 } },
+      { $addFields: { country: '$_id' } },
+      { $project: { _id: 0 } },
+    ]);
+    return agg;
+  });
+
+  res.status(200).send({
+    result: returnData,
+  });
+});
+
+userRoutes.getMethod('/agg/gender', async (req, res) => {
+  const cacheKey = hash({
+    url: req.originalUrl,
+  });
+  const cacheTime = 10;
+  const returnData = await radiusCacheHandler(cacheKey, cacheTime, async () => {
+    // it takes 7s
+    // const agg = await UserModel.aggregate([
+    //   {
+    //     $group: {
+    //       _id: `$${fieldName}`,
+    //       sum: { $sum: 1 },
+    //     },
+    //   },
+    //   { $limit: 15 },
+    //   { $sort: { sum: -1 } },
+    // ]);
+    const agg = await UserModel.aggregate([
+      {
+        $match: {
+          gender: { $eq: 'male' },
+        },
+      },
+      {
+        $group: {
+          _id: `$gender`,
+          sum: { $count: {} },
+        },
+      },
+      { $sort: { sum: -1 } },
+    ]);
+
+    const agg2 = await UserModel.aggregate([
+      {
+        $match: {
+          gender: { $eq: 'female' },
+        },
+      },
+      {
+        $group: {
+          _id: `$gender`,
+          sum: { $count: {} },
+        },
+      },
+      { $sort: { sum: -1 } },
+    ]);
+    const out = {
+      male: agg[0].sum,
+      female: agg2[0].sum,
+    };
+    return out;
+  });
+
+  res.status(200).send({
+    result: returnData,
+  });
+});
+
+// get total request count
+userRoutes.getMethod('/stat/count/totalRequest', async (req, res) => {
+  const cacheKey = hash({
+    url: req.originalUrl,
+  });
+  const getCount = await radiusCacheHandler(cacheKey, 2, async () => {
+    const countDocument = await UserActivityModel.estimatedDocumentCount();
+    return {
+      count: countDocument,
+      countInternationalSystem:
+        convertToInternationalCurrencySystem(countDocument),
+    };
+  });
+  res.status(200).send({
+    result: getCount,
+  });
+});
+
+// get top 15 user
+userRoutes.getMethod('/stat/top-15-user', async (req, res) => {
+  const cacheKey = hash({
+    url: req.originalUrl,
+  });
+  const getUser = await radiusCacheHandler(cacheKey, 10, async () => {
+    const agg = await UserActivityModel.aggregate([
+      {
+        $group: {
+          _id: '$user',
+          sum: { $sum: 1 },
+        },
+      },
+      { $limit: 15 },
+      { $sort: { sum: -1 } },
+      { $addFields: { user: '$_id' } },
+      { $project: { _id: 0 } },
+    ]);
+    const returnData = [];
+    for (let index = 0; index < agg.length; index++) {
+      const element = agg[index].user;
+      const userInfo = await UserModel.findById(element).select('-__v');
+      returnData.push({
+        user: userInfo,
+        sum: agg[index].sum,
+      });
+    }
+    return returnData;
+  });
+
+  res.status(200).send({
+    result: getUser,
   });
 });
 

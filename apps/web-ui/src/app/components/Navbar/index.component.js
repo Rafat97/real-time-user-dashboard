@@ -117,7 +117,7 @@ export function NavbarSimple() {
   ));
 
   return (
-    <Navbar width={{ sm: 300 }} p="md">
+    <Navbar width={{ sm: 300  }} height={`100%`} p="md">
       <Navbar.Section grow>
         <Group className={classes.header} position="apart">
           <h2>Logo</h2>
@@ -125,9 +125,9 @@ export function NavbarSimple() {
         </Group>
         {links}
       </Navbar.Section>
-
+{/*
       <Navbar.Section className={classes.footer}>
-        {/* <a
+         <a
           href="#"
           className={classes.link}
           onClick={(event) => event.preventDefault()}
@@ -143,8 +143,9 @@ export function NavbarSimple() {
         >
           <IconLogout className={classes.linkIcon} stroke={1.5} />
           <span>Logout</span>
-        </a> */}
+        </a> 
       </Navbar.Section>
+      */}
     </Navbar>
   );
 }

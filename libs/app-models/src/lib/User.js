@@ -50,6 +50,7 @@ const UserSchema = new mongoose.Schema(
 );
 UserSchema.index({ createdAt: 1 });
 UserSchema.index({ updatedAt: 1 });
+UserSchema.index({ country: -1 });
 UserSchema.index({ '$**': 'text' });
 export const UserModel = mongoose.model(UserModelRef, UserSchema);
 

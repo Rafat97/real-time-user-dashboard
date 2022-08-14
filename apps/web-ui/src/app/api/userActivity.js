@@ -4,7 +4,7 @@ export const userActivityApiCall = async (id) => {
   try {
     let url = `${
       process.env.API_USER_URL || `http://localhost:9000`
-    }/activity/${id}`;
+    }/v1/user/activity/${id}`;
     const config = {
       method: 'get',
       url: url,

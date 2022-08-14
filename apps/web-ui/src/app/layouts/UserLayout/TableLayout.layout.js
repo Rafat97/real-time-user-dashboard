@@ -10,7 +10,7 @@ import {
   Skeleton,
 } from '@mantine/core';
 import uniqueid from 'lodash/uniqueid';
-import { IconArchive } from '@tabler/icons';
+import { IconActivity, IconArchive } from '@tabler/icons';
 
 const useStyles = createStyles((theme) => ({
   rowSelected: {
@@ -21,7 +21,12 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-export default function TableLayout({ data, isLoading, onClickDelete }) {
+export default function TableLayout({
+  data,
+  isLoading,
+  onClickDelete,
+  onClickActivity,
+}) {
   const { classes, cx } = useStyles();
 
   const rowsLoading = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((item) => {
@@ -63,6 +68,14 @@ export default function TableLayout({ data, isLoading, onClickDelete }) {
             <IconArchive size={24} />
           </div>
         </td>
+        <td>
+          <div
+            style={{ cursor: 'pointer' }}
+            onClick={() => onClickActivity(item._id)}
+          >
+            <IconActivity size={24} />
+          </div>
+        </td>
       </tr>
     );
   });
@@ -82,6 +95,7 @@ export default function TableLayout({ data, isLoading, onClickDelete }) {
       <th>Gender</th>
       <th>Country</th>
       <th>Last Active</th>
+      <th></th>
       <th></th>
     </tr>
   );

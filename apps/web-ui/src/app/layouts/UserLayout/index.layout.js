@@ -18,6 +18,7 @@ import { useQuery } from '@tanstack/react-query';
 import { createRealApiCall } from '../../api/userCreateRealUser';
 import { userDeleteApiCall } from '../../api/userDelete';
 import CountrySelect from '../../components/CountrySelect/index.component';
+import { userActivityApiCall } from '../../api/userActivity';
 
 const ModalGenerateUser = ({
   openedGenerateUser,
@@ -220,6 +221,15 @@ export default function UserLayout() {
       alert(error.message);
     }
   };
+
+  const onClickUserActivity = async (id) => {
+    try {
+      await userActivityApiCall(id);
+      refetchData();
+    } catch (error) {
+      alert(error.message);
+    }
+  };
   return (
     <>
       <ModalGenerateUser
@@ -249,6 +259,7 @@ export default function UserLayout() {
             data={data?.data?.result || []}
             isLoading={isLoading}
             onClickDelete={onDeleteClick}
+            onClickActivity={onClickUserActivity}
           />
         </div>
         <Group style={{ margin: '10px 0' }} position="center">
