@@ -356,4 +356,161 @@ userRoutes.getMethod('/stat/top-15-user', async (req, res) => {
   });
 });
 
+// get daily active user
+userRoutes.getMethod('/stat/dau', async (req, res) => {
+  const cacheKey = hash({
+    url: req.originalUrl,
+  });
+
+  const dateFrom = new Date();
+  const dateTo = new Date(new Date().setDate(dateFrom.getDate() + 1));
+
+  let returnData = await UserActivityModel.aggregate([
+    {
+      $match: {
+        requestTime: {
+          $gte: new Date(
+            dateFrom.getFullYear(),
+            dateFrom.getMonth(),
+            dateFrom.getDate()
+          ),
+          $lt: new Date(
+            dateTo.getFullYear(),
+            dateTo.getMonth(),
+            dateTo.getDate()
+          ),
+        },
+      },
+    },
+    {
+      $group: {
+        _id: {
+          user: '$user',
+          ymd: { $dateToString: { format: '%Y-%m-%d', date: '$requestTime' } },
+        },
+      },
+    },
+    { $group: { _id: '$_id.ymd', au: { $count: {} } } },
+    { $addFields: { time: '$_id' } },
+    { $project: { _id: 0 } },
+    { $sort: { au: -1 } },
+    {
+      $group: {
+        _id: null,
+        total: {
+          $sum: '$au',
+        },
+      },
+    },
+    { $project: { _id: 0 } },
+  ]);
+  returnData = { totalDailyActiveUser: returnData[0]?.total || 0 };
+
+  res.status(200).send({
+    result: returnData,
+  });
+});
+
+// get weekly active user
+userRoutes.getMethod('/stat/wau', async (req, res) => {
+  const cacheKey = hash({
+    url: req.originalUrl,
+  });
+
+  const dateFrom = new Date();
+  const dateTo = new Date(new Date().setDate(dateFrom.getDate() + 7));
+
+  let returnData = await UserActivityModel.aggregate([
+    {
+      $match: {
+        requestTime: {
+          $gte: new Date(
+            dateFrom.getFullYear(),
+            dateFrom.getMonth(),
+            dateFrom.getDate()
+          ),
+          $lt: new Date(
+            dateTo.getFullYear(),
+            dateTo.getMonth(),
+            dateTo.getDate()
+          ),
+        },
+      },
+    },
+    {
+      $group: {
+        _id: {
+          user: '$user',
+          ymd: { $dateToString: { format: '%Y-%m-%d', date: '$requestTime' } },
+        },
+      },
+    },
+    { $group: { _id: '$_id.ymd', au: { $count: {} } } },
+    { $addFields: { time: '$_id' } },
+    { $project: { _id: 0 } },
+    { $sort: { au: -1 } },
+    {
+      $group: {
+        _id: null,
+        total: {
+          $sum: '$au',
+        },
+      },
+    },
+    { $project: { _id: 0 } },
+  ]);
+  returnData = { totalWeeklyActiveUser: returnData[0]?.total || 0 };
+
+  res.status(200).send({
+    result: returnData,
+  });
+});
+
+// get weekly active user
+userRoutes.getMethod('/stat/mau', async (req, res) => {
+  const cacheKey = hash({
+    url: req.originalUrl,
+  });
+
+  const dateFrom = new Date();
+  const dateTo = new Date(new Date().setDate(dateFrom.getDate() + 31));
+
+  let returnData = await UserActivityModel.aggregate([
+    {
+      $match: {
+        requestTime: {
+          $gte: new Date(dateFrom.getFullYear(), dateFrom.getMonth()),
+          $lt: new Date(dateTo.getFullYear(), dateTo.getMonth()),
+        },
+      },
+    },
+    {
+      $group: {
+        _id: {
+          user: '$user',
+          ymd: { $dateToString: { format: '%Y-%m-%d', date: '$requestTime' } },
+        },
+      },
+    },
+    { $group: { _id: '$_id.ymd', au: { $count: {} } } },
+    { $addFields: { time: '$_id' } },
+    { $project: { _id: 0 } },
+    { $sort: { au: -1 } },
+    {
+      $group: {
+        _id: null,
+        total: {
+          $sum: '$au',
+        },
+      },
+    },
+    { $project: { _id: 0 } },
+  ]);
+  returnData = { totalMonthlyActiveUser: returnData[0]?.total || 0 };
+
+  res.status(200).send({
+    result: returnData,
+  });
+});
+
 export { userRoutes };

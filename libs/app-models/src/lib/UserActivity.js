@@ -4,12 +4,20 @@ import { updateUserInfo, UserModelRef } from './User';
 const UserActivitySchema = new mongoose.Schema(
   {
     user: { type: Schema.Types.ObjectId, ref: UserModelRef, require: true },
+    requestTime: {
+      type: Date,
+      default: Date.now,
+    },
   },
   { timestamps: true, strict: false }
 );
 UserActivitySchema.index({ '$**': 'text' });
 UserActivitySchema.index({ createdAt: 1 });
+UserActivitySchema.index({ createdAt: -1 });
 UserActivitySchema.index({ updatedAt: 1 });
+UserActivitySchema.index({ updatedAt: -1 });
+UserActivitySchema.index({ requestTime: -1 });
+UserActivitySchema.index({ requestTime: 1 });
 export const UserActivityModel = mongoose.model(
   'UserActivity',
   UserActivitySchema
