@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
+/* eslint-disable react/jsx-no-useless-fragment */
 import { StrictMode } from 'react';
 import * as ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
@@ -24,6 +26,14 @@ const theme = {
   },
 };
 
+/** Removing console.log in production */
+if (process.env.NODE_ENV !== "development") {
+  console.clear();
+  console.log = () => {};
+  console.error = () => {};
+  console.warn = () => {};
+  console.disableYellowBox = true;
+}
 const nodeEnv = process.env.NODE_ENV || 'none';
 
 // Create a client

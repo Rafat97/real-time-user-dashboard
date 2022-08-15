@@ -1,0 +1,473 @@
+{
+	"info": {
+		"_postman_id": "81378c8c-b798-4dfb-892e-f11a8f56edac",
+		"name": "real-time-app",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "6604225"
+	},
+	"item": [
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Random User create",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9000/v1/generate/users/random/11000000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"v1",
+								"generate",
+								"users",
+								"random",
+								"11000000"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Users",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:9000/v1/user?limit=10&page=1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"v1",
+								"user"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "sortBy",
+									"value": "name",
+									"disabled": true
+								},
+								{
+									"key": "email",
+									"value": "1660569164239_random_962@test.com",
+									"disabled": true
+								},
+								{
+									"key": "_id",
+									"value": "62fa464ce667d6f6e9966231",
+									"disabled": true
+								},
+								{
+									"key": "name",
+									"value": "Rosenbaum",
+									"disabled": true
+								},
+								{
+									"key": "country",
+									"value": "Faroe",
+									"disabled": true
+								},
+								{
+									"key": "search",
+									"value": "Lisa Lesch DVM",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User Count",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9000/v1/user/admin/count",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"v1",
+								"user",
+								"admin",
+								"count"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get a Single User",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9000/v1/user/62f77c9b6645d6bf3fd35d29",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"v1",
+								"user",
+								"62f77c9b6645d6bf3fd35d29"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Insert new user",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"test1@com.d\",\r\n    \"name\":\"test@com.d\",\r\n    \"phoneNumber\":\"+123456789\",\r\n    \"gender\": \"male\"\r\n}"
+						},
+						"url": {
+							"raw": "http://localhost:9000/v1/user",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"v1",
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find By user email",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9000/v1/user/userEmail/test1@com.d",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"v1",
+								"user",
+								"userEmail",
+								"test1@com.d"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update A User Info",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"test1 user\",\r\n    \"newField\":\"test1 user\"\r\n}"
+						},
+						"url": {
+							"raw": "http://localhost:9000/v1/user/62f7b0cdde6b2a06fb51f86e",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"v1",
+								"user",
+								"62f7b0cdde6b2a06fb51f86e"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete a user",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9000/v1/user/62f8b118127f3c73ff0b9869",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"v1",
+								"user",
+								"62f8b118127f3c73ff0b9869"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User Activity",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9000/v1/user/activity/62f90b1446f1a87065ae46e5",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"v1",
+								"user",
+								"activity",
+								"62f90b1446f1a87065ae46e5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Top Country Agg",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9000/v1/user/agg/country",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"v1",
+								"user",
+								"agg",
+								"country"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Gender Agg",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9000/v1/user/agg/gender",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"v1",
+								"user",
+								"agg",
+								"gender"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get top 15 user",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9000/v1/user/stat/top-15-user",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"v1",
+								"user",
+								"stat",
+								"top-15-user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "All Request Count",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9000/v1/user/stat/count/totalRequest",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"v1",
+								"user",
+								"stat",
+								"count",
+								"totalRequest"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get count all the country",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9000/v1/user/agg/all/country",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"v1",
+								"user",
+								"agg",
+								"all",
+								"country"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Daily Active User",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9000/v1/user/stat/dau",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"v1",
+								"user",
+								"stat",
+								"dau"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Weekly Active User",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9000/v1/user/stat/wau",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"v1",
+								"user",
+								"stat",
+								"wau"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Monthly Active",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9000/v1/user/stat/mau",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"v1",
+								"user",
+								"stat",
+								"mau"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Device Info",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9000/v1/user/agg/device",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"v1",
+								"user",
+								"agg",
+								"device"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

@@ -4,6 +4,8 @@ import { NavbarSimple } from './components/Navbar/index.component';
 
 import UserPage from './page/user.page';
 import DashboardPage from './page/dashboard.page';
+import UserEditPage from './page/userEdit.page';
+import { APP_ROUTERS } from './constent/router.const';
 
 export function App() {
   return (
@@ -18,9 +20,16 @@ export function App() {
           <NavbarSimple />
         </div>
         <Routes>
-          <Route path="/" element={<DashboardPage />} />
           <Route
-            path="/users"
+            path={APP_ROUTERS.DASHBOARD_PATH}
+            element={<DashboardPage />}
+          />
+          <Route
+            path={APP_ROUTERS.USER_INFO_EDIT_PATH}
+            element={<UserEditPage />}
+          />
+          <Route
+            path={APP_ROUTERS.USER_TABLE_PATH}
             element={
               <UserPage />
               // <div>

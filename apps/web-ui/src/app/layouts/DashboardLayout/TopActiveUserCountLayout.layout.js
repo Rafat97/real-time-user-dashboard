@@ -21,7 +21,6 @@ ChartJS.register(
   Legend
 );
 
-
 export default function TopActiveUserCountLayout() {
   const { data } = useQuery(
     ['TopActiveUserCountLayout'],
@@ -40,10 +39,10 @@ export default function TopActiveUserCountLayout() {
         barThickness: 30,
         borderRadius: 100,
         categoryPercentage: 0.5,
-        data: [...data.map((data) => data.sum)],
+        data: [...data.map((data) => data?.sum || 0)],
       },
     ],
-    labels: [...data.map((data) => data.user.name)],
+    labels: [...data.map((data) => data.user?.name || 'undefined name')],
   };
 
   const options = {

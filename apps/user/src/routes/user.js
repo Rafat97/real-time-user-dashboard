@@ -30,8 +30,33 @@ userRoutes.getMethod('/', async (req, res) => {
     const page = req.query.page * 1 || 1;
     const skip = (page - 1) * limit;
     const sortBy = (req.query.sortBy || '-createdAt').split(',').join(' ');
+    const email = req.query.email || null;
+    const id = req.query._id || null;
+    const name = req.query.name || null;
+    const country = req.query.country || null;
+    const search = req.query.search || null;
+    let filter = {};
 
-    const allUser = await UserModel.find({})
+    if (email) {
+      filter = { ...filter, email: email };
+    }
+    if (id) {
+      filter = { ...filter, _id: id };
+    }
+    if (name) {
+      filter = {
+        ...filter,
+        $text: { $search: `"${name}"`, $caseSensitive: false },
+      };
+    }
+    if (country) {
+      filter = { ...filter, $text: { $search: `"${country}"` } };
+    }
+    if (search) {
+      filter = { ...filter, $text: { $search: `"${search}"` } };
+    }
+
+    const allUser = await UserModel.find({ ...filter })
       .select('-__v')
       .skip(skip)
       .limit(limit)
@@ -80,6 +105,9 @@ userRoutes.getMethod('/userEmail/:mail', async (req, res) => {
 userRoutes.getMethod('/:id', async (req, res) => {
   const { id } = req.params;
   const getSingleUser = await UserModel.findById(id).select('-__v');
+  if (!getSingleUser) {
+    throw new BadRequestValidation('User not found');
+  }
   res.status(200).send({
     result: getSingleUser,
   });

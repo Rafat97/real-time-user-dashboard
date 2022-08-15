@@ -1,10 +1,12 @@
 import {
   Button,
   Container,
+  Grid,
   Group,
   Modal,
   NumberInput,
   Select,
+  Text,
   TextInput,
 } from '@mantine/core';
 import { useState } from 'react';
@@ -19,6 +21,15 @@ import { createRealApiCall } from '../../api/userCreateRealUser';
 import { userDeleteApiCall } from '../../api/userDelete';
 import CountrySelect from '../../components/CountrySelect/index.component';
 import { userActivityApiCall } from '../../api/userActivity';
+import { useNavigate } from 'react-router-dom';
+import { APP_ROUTERS } from '../../constent/router.const';
+import {
+  IconChevronsLeft,
+  IconChevronsRight,
+  IconClearAll,
+  IconRefresh,
+  IconSearch,
+} from '@tabler/icons';
 
 const ModalGenerateUser = ({
   openedGenerateUser,
@@ -64,7 +75,6 @@ const ModalCreateUser = ({
   setOpenedCreateUser,
   onSubmitForm,
   onSubmitLoading,
-  clearAllValue,
 }) => {
   const GenerateSchema = Yup.object().shape({
     name: Yup.string().required('Name is required'),
@@ -144,24 +154,60 @@ const ModalCreateUser = ({
   );
 };
 
+const SearchField = ({ onSubmitForm, onSubmitLoading }) => {
+  const GenerateUserSchema = Yup.object().shape({
+    searchValue: Yup.string().required('Please give some input'),
+  });
+  const form = useForm({
+    initialValues: { searchOption: 'email', searchValue: '' },
+    validate: yupResolver(GenerateUserSchema),
+  });
+  return (
+    <form
+      style={{ minWidth: `1000px` }}
+      onSubmit={form.onSubmit((values) => onSubmitForm(values, form))}
+    >
+      <Grid my={50}>
+        <Grid.Col span={2}>
+          <Select
+            placeholder="Pick one"
+            defaultValue={`email`}
+            data={[
+              { value: 'email', label: 'Email' },
+              { value: 'search', label: 'Search' },
+            ]}
+            {...form.getInputProps('searchOption')}
+          />
+        </Grid.Col>
+        <Grid.Col span={9}>
+          <TextInput
+            placeholder={`Search anything`}
+            disabled={onSubmitLoading}
+            {...form.getInputProps('searchValue')}
+          />
+        </Grid.Col>
+        <Grid.Col span={1}>
+          <Button disabled={onSubmitLoading} type="submit">
+            <IconSearch size={20} />
+          </Button>
+        </Grid.Col>
+      </Grid>
+    </form>
+  );
+};
+
 export default function UserLayout() {
+  const navigate = useNavigate();
   const [pathParam, setPathParam] = useState({
     limit: 10,
     page: 1,
   });
 
-  const {
-    isLoading,
-    isError,
-    error,
-    data,
-    isFetching,
-    isPreviousData,
-    refetch,
-  } = useQuery(
+  const { isLoading, data, refetch } = useQuery(
     ['users', pathParam],
     () => getAllUserApiCall({ ...pathParam }),
     {
+      initialData: [],
       keepPreviousData: true,
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
@@ -230,6 +276,39 @@ export default function UserLayout() {
       alert(error.message);
     }
   };
+
+  const onClickUserEdit = async (id) => {
+    try {
+      navigate(APP_ROUTERS.USER_INFO_EDIT_PATH_PREFIX + '/' + id);
+      refetchData();
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  const onClickSearchFiled = async (data) => {
+    try {
+      console.log(data);
+      const filter = {
+        [data.searchOption]: data.searchValue,
+      };
+      setPathParam({ ...pathParam, ...filter });
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  const onClickReset = async () => {
+    try {
+      setPathParam({
+        limit: 10,
+        page: 1,
+      });
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
   return (
     <>
       <ModalGenerateUser
@@ -244,44 +323,81 @@ export default function UserLayout() {
         onSubmitForm={createNewUserSubmitForm}
         onSubmitLoading={loadingCreateUser}
       />
-      <Container size="xl" style={{ margin: 'auto auto' }}>
-        <div>
-          <Group style={{ margin: '50px 0' }} position="left">
-            <Button onClick={() => setOpenedGenerateUser(true)}>
-              Generate Random User
-            </Button>
-            <Button onClick={() => setOpenedCreateUser(true)}>
-              Add a New User
-            </Button>
-            <Button onClick={() => refetchData()}>Refresh</Button>
+      <Container size="xl" style={{ margin: 'auto auto', minHeight: '100vh' }}>
+        {(data?.data?.result || []).length <= 0 ? (
+          <Group position="center">
+            <SearchField onSubmitForm={onClickSearchFiled} />
+            <Group style={{ margin: '150px 0' }}>
+              <Text size={40} align="center">
+                <Group style={{ margin: '50px 0 10px 0' }} position="center">
+                  <Button onClick={() => setOpenedGenerateUser(true)}>
+                    Generate Random User
+                  </Button>
+                  <Button onClick={() => setOpenedCreateUser(true)}>
+                    Add a New User
+                  </Button>
+                  <Button onClick={() => onClickReset()}>
+                    <IconClearAll size={20} />
+                  </Button>
+                </Group>
+                Oops! No User Found
+              </Text>
+            </Group>
           </Group>
-          <TableLayout
-            data={data?.data?.result || []}
-            isLoading={isLoading}
-            onClickDelete={onDeleteClick}
-            onClickActivity={onClickUserActivity}
-          />
-        </div>
-        <Group style={{ margin: '10px 0' }} position="center">
-          <Button
-            disabled={pathParam.page <= 1 ? true : false}
-            onClick={() =>
-              setPathParam({ ...pathParam, page: pathParam.page - 1 })
-            }
-          >
-            Previous Page
-          </Button>
-          <Button
-            disabled={
-              (data?.data?.result || []).length < pathParam.limit ? true : false
-            }
-            onClick={() =>
-              setPathParam({ ...pathParam, page: pathParam.page + 1 })
-            }
-          >
-            Next Page
-          </Button>
-        </Group>
+        ) : (
+          <div>
+            <SearchField onSubmitForm={onClickSearchFiled} />
+            <Grid>
+              <Grid.Col span={6}>
+                <Group style={{ margin: '50px 0 10px 0' }}>
+                  <Button onClick={() => setOpenedGenerateUser(true)}>
+                    Generate Random User
+                  </Button>
+                  <Button onClick={() => setOpenedCreateUser(true)}>
+                    Add a New User
+                  </Button>
+                  <Button onClick={() => refetchData()}>
+                    <IconRefresh size={20} />
+                  </Button>
+                  <Button onClick={() => onClickReset()}>
+                    <IconClearAll size={20} />
+                  </Button>
+                </Group>
+              </Grid.Col>
+              <Grid.Col span={6}>
+                <Group style={{ margin: '50px 0 10px 0' }} position="right">
+                  <Button
+                    disabled={pathParam.page <= 1 ? true : false}
+                    onClick={() =>
+                      setPathParam({ ...pathParam, page: pathParam.page - 1 })
+                    }
+                  >
+                    <IconChevronsLeft size={30} />
+                  </Button>
+                  <Button
+                    disabled={
+                      (data?.data?.result || []).length < pathParam.limit
+                        ? true
+                        : false
+                    }
+                    onClick={() =>
+                      setPathParam({ ...pathParam, page: pathParam.page + 1 })
+                    }
+                  >
+                    <IconChevronsRight size={30} />
+                  </Button>
+                </Group>
+              </Grid.Col>
+            </Grid>
+            <TableLayout
+              data={data?.data?.result || []}
+              isLoading={isLoading}
+              onClickDelete={onDeleteClick}
+              onClickActivity={onClickUserActivity}
+              onClickEdit={onClickUserEdit}
+            />
+          </div>
+        )}
       </Container>
     </>
   );

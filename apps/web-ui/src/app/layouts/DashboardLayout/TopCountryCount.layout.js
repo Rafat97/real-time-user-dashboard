@@ -39,10 +39,10 @@ export default function TopCountryCountLayout() {
         barThickness: 30,
         borderRadius: 100,
         categoryPercentage: 0.5,
-        data: [...data.map((data) => data.sum)],
+        data: [...data.map((data) => data?.sum || 0)],
       },
     ],
-    labels: [...data.map((data) => data.country)],
+    labels: [...data.map((data) => data?.country || "undefined country")],
   };
 
   const options = {

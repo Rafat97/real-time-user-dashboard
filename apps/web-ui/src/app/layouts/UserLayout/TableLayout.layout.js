@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { formatDistance, subDays } from 'date-fns';
+import { formatDistance } from 'date-fns';
 import {
   createStyles,
   Table,
@@ -9,8 +8,8 @@ import {
   Text,
   Skeleton,
 } from '@mantine/core';
-import uniqueid from 'lodash/uniqueid';
-import { IconActivity, IconArchive } from '@tabler/icons';
+import uniqueId from 'lodash/uniqueId';
+import { IconActivity, IconArchive, IconEdit } from '@tabler/icons';
 
 const useStyles = createStyles((theme) => ({
   rowSelected: {
@@ -26,12 +25,13 @@ export default function TableLayout({
   isLoading,
   onClickDelete,
   onClickActivity,
+  onClickEdit,
 }) {
   const { classes, cx } = useStyles();
 
   const rowsLoading = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((item) => {
     return (
-      <tr key={uniqueid('UserTable_')}>
+      <tr key={uniqueId('UserTable_')}>
         <td>
           <Skeleton height={40} radius="md" animate={true} />
         </td>
@@ -59,6 +59,14 @@ export default function TableLayout({
           {formatDistance(new Date(item.lastActive), new Date(), {
             addSuffix: true,
           })}
+        </td>
+        <td>
+          <div
+            style={{ cursor: 'pointer' }}
+            onClick={() => onClickEdit(item._id)}
+          >
+            <IconEdit size={24} />
+          </div>
         </td>
         <td>
           <div
@@ -95,6 +103,7 @@ export default function TableLayout({
       <th>Gender</th>
       <th>Country</th>
       <th>Last Active</th>
+      <th></th>
       <th></th>
       <th></th>
     </tr>

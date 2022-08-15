@@ -2,7 +2,15 @@
 import { useState, useEffect } from 'react';
 import { createStyles, Navbar, Group, Code } from '@mantine/core';
 import { IconUsers, IconHome2 } from '@tabler/icons';
-import { useLocation, useNavigate } from 'react-router-dom';
+import {
+  unstable_HistoryRouter,
+  useLocation,
+  useMatch,
+  useNavigate,
+  useParams,
+} from 'react-router-dom';
+import { APP_ROUTERS } from '../../constent/router.const';
+import { useCurrentPath } from '../../hook/useCurrentPath';
 
 const useStyles = createStyles((theme, _params, getRef) => {
   const icon = getRef('icon');
@@ -83,31 +91,34 @@ const useStyles = createStyles((theme, _params, getRef) => {
 });
 
 const data = [
-  { link: '/', label: 'Dashboard', icon: IconHome2 },
-  { link: '/users', label: 'Users', icon: IconUsers },
+  { link: [APP_ROUTERS.DASHBOARD_PATH], label: 'Dashboard', icon: IconHome2 },
+  {
+    link: [APP_ROUTERS.USER_TABLE_PATH, APP_ROUTERS.USER_INFO_EDIT_PATH],
+    label: 'Users',
+    icon: IconUsers,
+  },
 ];
 
 export function NavbarSimple() {
   const navigate = useNavigate();
-  let location = useLocation();
+  const match = useCurrentPath();
   const { classes, cx } = useStyles();
-  const [active, setActive] = useState(location.pathname);
-  console.log(location);
+  const [active, setActive] = useState(match);
 
   useEffect(() => {
-    setActive(location.pathname);
-  }, [location]);
+    setActive(match);
+  }, [match]);
 
   const links = data.map((item) => (
     <a
       className={cx(classes.link, {
-        [classes.linkActive]: item.link === active,
+        [classes.linkActive]: item.link.includes(active),
       })}
       href={item.link}
       key={item.label}
       onClick={(event) => {
         event.preventDefault();
-        navigate(item.link);
+        navigate(item.link[0]);
         setActive(item.label);
       }}
     >
@@ -117,7 +128,7 @@ export function NavbarSimple() {
   ));
 
   return (
-    <Navbar width={{ sm: 300  }} height={`100%`} p="md">
+    <Navbar width={{ sm: 300 }} height={`100%`} p="md">
       <Navbar.Section grow>
         <Group className={classes.header} position="apart">
           <h2>Logo</h2>
@@ -125,7 +136,7 @@ export function NavbarSimple() {
         </Group>
         {links}
       </Navbar.Section>
-{/*
+      {/*
       <Navbar.Section className={classes.footer}>
          <a
           href="#"
@@ -143,7 +154,7 @@ export function NavbarSimple() {
         >
           <IconLogout className={classes.linkIcon} stroke={1.5} />
           <span>Logout</span>
-        </a> 
+        </a>
       </Navbar.Section>
       */}
     </Navbar>

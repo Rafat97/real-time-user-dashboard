@@ -12,7 +12,6 @@
     "user": "apps/user",
     "user-create-consumer": "apps/user-create-consumer",
     "user-realtime": "apps/user-realtime",
-    "web-ui": "apps/web-ui",
-    "web-ui-e2e": "apps/web-ui-e2e"
+    "web-ui": "apps/web-ui"
   }
 }

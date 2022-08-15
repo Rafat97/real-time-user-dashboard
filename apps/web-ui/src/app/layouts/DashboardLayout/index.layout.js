@@ -1,5 +1,4 @@
 import style from './index.module.scss';
-import { useEffect } from 'react';
 import {
   Avatar,
   Card,
@@ -19,12 +18,9 @@ import {
 } from '../../api/userCounter';
 import { useListState } from '@mantine/hooks';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import uniqueid from 'lodash/uniqueid';
+import uniqueId from 'lodash/uniqueId';
 import { allRequestCounterApiCall } from '../../api/allRequestCounter';
-import {
-  allCountryCounterApiCall,
-  Top15UserCounterApiCall,
-} from '../../api/totalCountry';
+import { allCountryCounterApiCall } from '../../api/totalCountry';
 import MaleFemaleCountLayout from './MaleFemaleCount.layout';
 import TopCountryCountLayout from './TopCountryCount.layout';
 import TopActiveUserCountLayout from './TopActiveUserCountLayout.layout';
@@ -64,13 +60,9 @@ const UserCountLayout = ({ text, count, icon = null }) => {
 };
 
 const DraggableBasicInfoLayout = () => {
-  const { isLoading, error, data } = useQuery(
-    ['userCounter'],
-    getTotalUserCounter,
-    {
-      refetchInterval: 1000,
-    }
-  );
+  const { data } = useQuery(['userCounter'], getTotalUserCounter, {
+    refetchInterval: 1000,
+  });
 
   const { data: allRequestCounter } = useQuery(
     ['allRequestCounter'],
@@ -90,15 +82,15 @@ const DraggableBasicInfoLayout = () => {
 
   const [state, handlers] = useListState([
     {
-      symbol: uniqueid('DraggableBasicInfoLayout_'),
+      symbol: uniqueId('DraggableBasicInfoLayout_'),
       componentType: 'USER_COUNTER',
     },
     {
-      symbol: uniqueid('DraggableBasicInfoLayout_'),
+      symbol: uniqueId('DraggableBasicInfoLayout_'),
       componentType: 'ALL_REQUEST_COUNTER',
     },
     {
-      symbol: uniqueid('DraggableBasicInfoLayout_'),
+      symbol: uniqueId('DraggableBasicInfoLayout_'),
       componentType: 'ALL_COUNTRY_COUNTER',
     },
   ]);
@@ -167,7 +159,7 @@ const DraggableBasicInfoLayout = () => {
 };
 
 const DraggableUserActivityInfoLayout = () => {
-  const { isLoading, error, data } = useQuery(
+  const { data } = useQuery(
     ['getDailyActiveUserCounter'],
     getDailyActiveUserApiCall,
     {
@@ -194,15 +186,15 @@ const DraggableUserActivityInfoLayout = () => {
 
   const [state, handlers] = useListState([
     {
-      symbol: uniqueid('DraggableUserActivityInfoLayout_'),
+      symbol: uniqueId('DraggableUserActivityInfoLayout_'),
       componentType: 'DAILY_ACTIVE_USER',
     },
     {
-      symbol: uniqueid('DraggableUserActivityInfoLayout_'),
+      symbol: uniqueId('DraggableUserActivityInfoLayout_'),
       componentType: 'WEEKLY_ACTIVE_USER',
     },
     {
-      symbol: uniqueid('DraggableUserActivityInfoLayout_'),
+      symbol: uniqueId('DraggableUserActivityInfoLayout_'),
       componentType: 'MONTHLY_ACTIVE_USER',
     },
   ]);
