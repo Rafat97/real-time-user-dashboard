@@ -303,6 +303,51 @@ userRoutes.getMethod('/agg/gender', async (req, res) => {
   });
 });
 
+userRoutes.getMethod('/agg/device', async (req, res) => {
+  const cacheKey = hash({
+    url: req.originalUrl,
+  });
+  const cacheTime = 1;
+  const returnData = await radiusCacheHandler(cacheKey, cacheTime, async () => {
+    const agg = await UserActivityModel.aggregate([
+      {
+        $facet: {
+          deviceOsName: [
+            {
+              $group: {
+                _id: `$device.os.name`,
+                sum: { $sum: 1 },
+              },
+            },
+            { $sort: { sum: -1 } },
+            { $addFields: { name: '$_id' } },
+            { $project: { _id: 0 } },
+            { $limit: 5 },
+          ],
+          deviceBrowserName: [
+            {
+              $group: {
+                _id: `$device.browser.name`,
+                sum: { $sum: 1 },
+              },
+            },
+            { $sort: { sum: -1 } },
+            { $addFields: { name: '$_id' } },
+            { $project: { _id: 0 } },
+            { $limit: 5 },
+          ],
+        },
+      },
+    ]);
+
+    return agg[0];
+  });
+
+  res.status(200).send({
+    result: returnData,
+  });
+});
+
 // get total request count
 userRoutes.getMethod('/stat/count/totalRequest', async (req, res) => {
   const cacheKey = hash({

@@ -70,7 +70,6 @@ export default function MaleFemaleCountLayout() {
       title: {
         display: true,
         color: 'white',
-        text: 'Total number of male & female',
       },
     },
   };

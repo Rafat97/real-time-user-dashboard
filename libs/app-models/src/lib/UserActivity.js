@@ -37,3 +37,16 @@ export const createUserActivate = async (message) => {
     console.log('-----------------createUser------------');
   }
 };
+
+export const deleteUserActivate = async (user) => {
+  try {
+    let doc = await UserActivityModel.deleteMany({
+      user: user,
+    });
+    console.log(doc);
+  } catch (error) {
+    console.log('-----------------createUser------------');
+    console.log(error);
+    console.log('-----------------createUser------------');
+  }
+};

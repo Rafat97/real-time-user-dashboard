@@ -54,7 +54,6 @@ export default function TopActiveUserCountLayout() {
       title: {
         display: true,
         color: 'white',
-        text: 'Top 15 Users',
       },
     },
   };

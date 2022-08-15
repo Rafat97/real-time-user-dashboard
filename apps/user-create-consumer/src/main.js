@@ -6,7 +6,11 @@ import {
   createKafkaAdminTopic,
 } from '@myapp/utils';
 import { USER_EVENT } from '@myapp/event';
-import { createRandomUser, createUserActivate } from '@myapp/app-models';
+import {
+  createRandomUser,
+  createUserActivate,
+  deleteUserActivate,
+} from '@myapp/app-models';
 import { appConfig } from '@myapp/app-config';
 
 const appConfigValues = appConfig();
@@ -40,6 +44,10 @@ const kafkaConsumerRun = {
       } else if (topic === USER_EVENT.USER_ACTIVATE_CREATE) {
         const stringToObject = JSON.parse(message.value?.toString());
         createUserActivate(stringToObject.body);
+        console.log('completed USER_ACTIVATE_CREATE');
+      } else if (topic === USER_EVENT.USER_DELETED_SINGLE) {
+        const stringToObject = JSON.parse(message.value?.toString());
+        deleteUserActivate(stringToObject.body.deleteId);
         console.log('completed USER_ACTIVATE_CREATE');
       }
       console.log(`[${topic}] [${partition}] [${message.value?.toString()}]`);

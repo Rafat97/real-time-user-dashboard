@@ -53,7 +53,6 @@ export default function TopCountryCountLayout() {
       title: {
         display: true,
         color: 'white',
-        text: 'Top 15 Countries',
       },
     },
   };

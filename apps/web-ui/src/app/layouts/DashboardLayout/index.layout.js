@@ -28,6 +28,7 @@ import {
 import MaleFemaleCountLayout from './MaleFemaleCount.layout';
 import TopCountryCountLayout from './TopCountryCount.layout';
 import TopActiveUserCountLayout from './TopActiveUserCountLayout.layout';
+import DeviceCounterLayout from './DeviceCounter.layout';
 
 const UserCountLayout = ({ text, count, icon = null }) => {
   return (
@@ -279,6 +280,9 @@ export default function DashboardLayout() {
         <Grid mt={50}>
           <Grid.Col span={12}>
             <Card shadow="sm" p="lg" radius="md" withBorder>
+              <Text size={30} pb={5}>
+                Top 15 Users
+              </Text>
               <TopActiveUserCountLayout />
             </Card>
           </Grid.Col>
@@ -287,6 +291,20 @@ export default function DashboardLayout() {
         <Grid mt={50}>
           <Grid.Col span={12}>
             <Card shadow="sm" p="lg" radius="md" withBorder>
+              <Text size={30} pb={5}>
+                Device Count
+              </Text>
+              <DeviceCounterLayout />
+            </Card>
+          </Grid.Col>
+        </Grid>
+
+        <Grid mt={50}>
+          <Grid.Col span={12}>
+            <Card shadow="sm" p="lg" radius="md" withBorder>
+              <Text size={30} pb={5}>
+                Gender Counter
+              </Text>
               <MaleFemaleCountLayout />
             </Card>
           </Grid.Col>
@@ -295,6 +313,9 @@ export default function DashboardLayout() {
         <Grid mt={50}>
           <Grid.Col span={12}>
             <Card shadow="sm" p="lg" radius="md" withBorder>
+              <Text size={30} pb={5}>
+                Top 15 Countries
+              </Text>
               <TopCountryCountLayout />
             </Card>
           </Grid.Col>
