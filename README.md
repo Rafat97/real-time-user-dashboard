@@ -1,13 +1,25 @@
+
 # Project Prerequisite 
 
 * node js
 * npm / yarn 
 * docker
 * docker-compose 
+* nx workspace [It will help you to manage project]
 
 
 # Running flow
 
-1. user-create-consumer
-2. user
-3. user-realtime
+```mermaid
+
+graph TD;
+    mongo-db--> 
+    redis --> 
+    zookeeper --> 
+    kafka -->
+    user-create-consumer(User Consumer For kafka) --> 
+    user(User Service) -->
+    web-ui(React Web UI) -->
+    management-mongo(Mongo Express);
+    
+```

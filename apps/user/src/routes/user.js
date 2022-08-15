@@ -334,8 +334,8 @@ userRoutes.getMethod('/stat/top-15-user', async (req, res) => {
           sum: { $sum: 1 },
         },
       },
-      { $limit: 15 },
       { $sort: { sum: -1 } },
+      { $limit: 15 },
       { $addFields: { user: '$_id' } },
       { $project: { _id: 0 } },
     ]);
