@@ -104,9 +104,9 @@ services:
       - 'APP_PORT=9000'
     ports:
       - '9000'
-    # volumes:
-    #   - ./:/usr/src/app
-    #   - /usr/src/app/node_modules
+    volumes:
+      - ./:/usr/src/app
+      - /usr/src/app/node_modules
     networks:
       - rafat97__network_public
 
@@ -125,9 +125,9 @@ services:
       - 'APP_PORT=9000'
     ports:
       - '9000:9000'
-    # volumes:
-    #   - ./:/usr/src/app
-    #   - /usr/src/app/node_modules
+    volumes:
+      - ./:/usr/src/app
+      - /usr/src/app/node_modules
     networks:
       - rafat97__network_public
 

@@ -25,7 +25,7 @@ const theme = {
     ],
   },
 };
-
+console.log( process.env)
 /** Removing console.log in production */
 if (process.env.NODE_ENV !== "development") {
   console.clear();

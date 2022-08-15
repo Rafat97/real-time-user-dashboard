@@ -22,7 +22,7 @@ const kafkaClientConfig = {
   connectionTimeout: 10000,
 };
 const redisConfig = {
-  url: appConfigValues.redis.APP_REDIS_CONNECTION_STRING,
+  url: appConfigValues.redis.connectionString,
 };
 
 const kafkaConsumerGroupId = 'user-consumer-create';

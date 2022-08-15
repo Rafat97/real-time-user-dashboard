@@ -228,21 +228,28 @@ userRoutes.deleteMethod('/:id', async (req, res) => {
 // get aggregation by country
 userRoutes.getMethod('/agg/all/:fieldName', async (req, res) => {
   const { fieldName } = req.params;
-  const agg = await UserModel.aggregate([
-    {
-      $group: {
-        _id: `$${fieldName}`,
-        sum: { $sum: 1 },
+  const cacheKey = hash({
+    url: req.originalUrl,
+  });
+  const cacheTime = 10;
+  const returnData = await radiusCacheHandler(cacheKey, cacheTime, async () => {
+    const agg = await UserModel.aggregate([
+      {
+        $group: {
+          _id: `$${fieldName}`,
+          sum: { $sum: 1 },
+        },
       },
-    },
-    { $sort: { sum: -1 } },
-    { $count: 'sum' },
-  ]);
+      { $sort: { sum: -1 } },
+      { $count: 'sum' },
+    ]);
+    return {
+      allCountry: agg[0]?.sum || 0,
+    };
+  });
 
   res.status(200).send({
-    result: {
-      allCountry: agg[0].sum,
-    },
+    result: returnData,
   });
 });
 
@@ -320,8 +327,8 @@ userRoutes.getMethod('/agg/gender', async (req, res) => {
       { $sort: { sum: -1 } },
     ]);
     const out = {
-      male: agg[0].sum,
-      female: agg2[0].sum,
+      male: agg[0]?.sum || 0,
+      female: agg2[0]?.sum || 0,
     };
     return out;
   });

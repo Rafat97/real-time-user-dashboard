@@ -1,6 +1,7 @@
 import { createClient } from 'redis';
 
 export const redisConnectionCheck = async (connectionOption) => {
+  console.log(connectionOption)
   const client = createClient({ ...connectionOption });
   await client.connect();
   console.log('redis connect successfully');

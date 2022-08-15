@@ -2,8 +2,8 @@ FROM node:lts-alpine
 
 RUN apk add --no-cache libc6-compat
 WORKDIR /usr/src/app
-# COPY ./package.json /usr/src/app
-COPY . /usr/src/app
+COPY ./package.json /usr/src/app
+# COPY . /usr/src/app
 RUN yarn install --frozen-lockfile
 
 ENV APP_MONGODB_CONNECTION_STRING "mongodb://root:example@mongo-db:27017/user?authSource=admin&retryWrites=true&w=majority"
