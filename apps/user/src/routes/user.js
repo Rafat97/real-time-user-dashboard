@@ -229,11 +229,11 @@ userRoutes.getMethod('/agg/country', async (req, res) => {
       {
         $group: {
           _id: `$country`,
-          sum: { $count: {} },
+          sum: { $sum: 1 },
         },
       },
-      { $limit: 15 },
       { $sort: { sum: -1 } },
+      { $limit: 15 },
       { $addFields: { country: '$_id' } },
       { $project: { _id: 0 } },
     ]);
