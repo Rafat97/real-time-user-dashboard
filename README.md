@@ -1,4 +1,8 @@
 
+# Introduction 
+
+A system architecture for handling 10M+ user data with a real time dashboard.  
+
 # Project Prerequisite 
 
 * node js
@@ -25,7 +29,7 @@ docker-compose up -d --build
 
 ## Using Manually 
 
-* First deploy those dependency
+* First deploy those dependency. Or for all the resources we can run `docker-compose -f docker-compose-resource.yml up -d --build`. 
   * MonngoDB Server. Must Exposed in `27017` Port
   * Redis Server. Must Exposed in`6379` Port. Also, `ALLOW_EMPTY_PASSWORD=yes ,REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL`
   * Zookeeper Server. Must expose in `2181` port
@@ -134,3 +138,14 @@ sequenceDiagram
     end
 
 ```
+
+# Video
+## Basic Frontend UI
+
+./img-docs/Video/1.basic-ui-when-no-data.mp4
+
+## Real-Time Update With Bulk User Insert
+
+./img-docs/Video/2-real-time-update.mp4
+
+
