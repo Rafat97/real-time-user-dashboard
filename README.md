@@ -142,9 +142,13 @@ sequenceDiagram
 # Video
 ## Basic Frontend UI
 
+https://user-images.githubusercontent.com/21246862/184856008-5913a5bf-4913-4827-ace2-1a9b6374f1bd.mp4
+
 ./img-docs/Video/1.basic-ui-when-no-data.mp4
 
 ## Real-Time Update With Bulk User Insert
+
+https://user-images.githubusercontent.com/21246862/184856070-8624241b-48be-489e-90ec-c98d0191329c.mp4
 
 ./img-docs/Video/2-real-time-update.mp4
 
