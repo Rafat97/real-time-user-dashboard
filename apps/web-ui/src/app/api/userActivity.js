@@ -1,10 +1,9 @@
 import axios from 'axios';
+import { getUserApiBaseUrl } from '../utils/baseUrl';
 
 export const userActivityApiCall = async (id) => {
   try {
-    let url = `${
-      process.env.API_USER_URL || `http://localhost:9000`
-    }/v1/user/activity/${id}`;
+    let url = `${getUserApiBaseUrl()}/v1/user/activity/${id}`;
     const config = {
       method: 'get',
       url: url,

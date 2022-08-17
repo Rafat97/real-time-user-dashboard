@@ -1,8 +1,9 @@
 import axios from 'axios';
+import { getUserApiBaseUrl } from '../utils/baseUrl';
 
 export const getAllUserApiCall = async (options) => {
   try {
-    let url = `${process.env.API_USER_URL || `http://localhost:9000`}/v1/user?`;
+    let url = `${getUserApiBaseUrl()}/v1/user?`;
     for (const key in options) {
       const element = options[key];
       url += `${key}=${element}&`;

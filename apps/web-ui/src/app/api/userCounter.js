@@ -1,8 +1,7 @@
 import axios from 'axios';
+import { getUserApiBaseUrl } from '../utils/baseUrl';
 export const getTotalUserCounter = async () => {
-  let url = `${
-    process.env.API_USER_URL || `http://localhost:9000`
-  }/v1/user/admin/count`;
+  let url = `${getUserApiBaseUrl()}/v1/user/admin/count`;
   const config = {
     method: 'get',
     url: url,
@@ -13,9 +12,7 @@ export const getTotalUserCounter = async () => {
 };
 
 export const getTotalGenderCounterApiCall = async () => {
-  let url = `${
-    process.env.API_USER_URL || `http://localhost:9000`
-  }/v1/user/agg/gender`;
+  let url = `${getUserApiBaseUrl()}/v1/user/agg/gender`;
   const config = {
     method: 'get',
     url: url,
@@ -26,9 +23,7 @@ export const getTotalGenderCounterApiCall = async () => {
 };
 
 export const getDailyActiveUserApiCall = async () => {
-  let url = `${
-    process.env.API_USER_URL || `http://localhost:9000`
-  }/v1/user/stat/dau`;
+  let url = `${getUserApiBaseUrl()}/v1/user/stat/dau`;
   const config = {
     method: 'get',
     url: url,
@@ -39,9 +34,7 @@ export const getDailyActiveUserApiCall = async () => {
 };
 
 export const getWeeklyActiveUserApiCall = async () => {
-  let url = `${
-    process.env.API_USER_URL || `http://localhost:9000`
-  }/v1/user/stat/wau`;
+  let url = `${getUserApiBaseUrl()}/v1/user/stat/wau`;
   const config = {
     method: 'get',
     url: url,
@@ -52,9 +45,7 @@ export const getWeeklyActiveUserApiCall = async () => {
 };
 
 export const getMonthlyActiveUserApiCall = async () => {
-  let url = `${
-    process.env.API_USER_URL || `http://localhost:9000`
-  }/v1/user/stat/mau`;
+  let url = `${getUserApiBaseUrl()}/v1/user/stat/mau`;
   const config = {
     method: 'get',
     url: url,
@@ -65,9 +56,7 @@ export const getMonthlyActiveUserApiCall = async () => {
 };
 
 export const getDeviceCounterApiCall = async () => {
-  let url = `${
-    process.env.API_USER_URL || `http://localhost:9000`
-  }/v1/user/agg/device`;
+  let url = `${getUserApiBaseUrl()}/v1/user/agg/device`;
   const config = {
     method: 'get',
     url: url,

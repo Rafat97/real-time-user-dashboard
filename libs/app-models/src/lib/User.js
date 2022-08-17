@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import { faker } from '@faker-js/faker';
 import { ulid } from 'ulid';
+import { convertToInternationalCurrencySystem } from '@myapp/utils';
 
 export const UserModelRef = 'User';
 
@@ -113,4 +114,77 @@ export const updateUserInfo = async (id, body) => {
     runValidators: true,
   });
   return userUpdate;
+};
+
+export const getGenderAggregation = async () => {
+  // it takes 7s
+  // const agg = await UserModel.aggregate([
+  //   {
+  //     $group: {
+  //       _id: `$${fieldName}`,
+  //       sum: { $sum: 1 },
+  //     },
+  //   },
+  //   { $limit: 15 },
+  //   { $sort: { sum: -1 } },
+  // ]);
+  const agg = await UserModel.aggregate([
+    {
+      $match: {
+        gender: { $eq: 'male' },
+      },
+    },
+    {
+      $group: {
+        _id: `$gender`,
+        sum: { $count: {} },
+      },
+    },
+    { $sort: { sum: -1 } },
+  ]);
+
+  const agg2 = await UserModel.aggregate([
+    {
+      $match: {
+        gender: { $eq: 'female' },
+      },
+    },
+    {
+      $group: {
+        _id: `$gender`,
+        sum: { $count: {} },
+      },
+    },
+    { $sort: { sum: -1 } },
+  ]);
+  const out = {
+    male: agg[0]?.sum || 0,
+    female: agg2[0]?.sum || 0,
+  };
+  return out;
+};
+
+export const getUserCountryAggregation = async () => {
+  const agg = await UserModel.aggregate([
+    {
+      $group: {
+        _id: `$country`,
+        sum: { $sum: 1 },
+      },
+    },
+    { $sort: { sum: -1 } },
+    { $limit: 15 },
+    { $addFields: { country: '$_id' } },
+    { $project: { _id: 0 } },
+  ]);
+  return agg;
+};
+
+export const getUserEstimateCounter = async () => {
+  const countDocument = await UserModel.estimatedDocumentCount();
+  return {
+    count: countDocument,
+    countInternationalSystem:
+      convertToInternationalCurrencySystem(countDocument),
+  };
 };

@@ -1,8 +1,7 @@
 import axios from 'axios';
+import { getUserApiBaseUrl } from '../utils/baseUrl';
 export const allRequestCounterApiCall = async () => {
-  let url = `${
-    process.env.API_USER_URL || `http://localhost:9000`
-  }/v1/user/stat/count/totalRequest`;
+  let url = `${getUserApiBaseUrl()}/v1/user/stat/count/totalRequest`;
   const config = {
     method: 'get',
     url: url,

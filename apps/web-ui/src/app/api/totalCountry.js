@@ -1,8 +1,7 @@
 import axios from 'axios';
+import { getUserApiBaseUrl } from '../utils/baseUrl';
 export const allCountryCounterApiCall = async () => {
-  let url = `${
-    process.env.API_USER_URL || `http://localhost:9000`
-  }/v1/user/agg/all/country`;
+  let url = `${getUserApiBaseUrl()}/v1/user/agg/all/country`;
   const config = {
     method: 'get',
     url: url,
@@ -14,9 +13,7 @@ export const allCountryCounterApiCall = async () => {
 };
 
 export const allTop15CountryCounterApiCall = async () => {
-  let url = `${
-    process.env.API_USER_URL || `http://localhost:9000`
-  }/v1/user/agg/country`;
+  let url = `${getUserApiBaseUrl()}/v1/user/agg/country`;
   const config = {
     method: 'get',
     url: url,
@@ -27,11 +24,8 @@ export const allTop15CountryCounterApiCall = async () => {
   return data.data.result;
 };
 
-
 export const Top15UserCounterApiCall = async () => {
-  let url = `${
-    process.env.API_USER_URL || `http://localhost:9000`
-  }/v1/user/stat/top-15-user`;
+  let url = `${getUserApiBaseUrl()}/v1/user/stat/top-15-user`;
   const config = {
     method: 'get',
     url: url,

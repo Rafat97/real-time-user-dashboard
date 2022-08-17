@@ -1,9 +1,8 @@
 import axios from 'axios';
+import { getUserApiBaseUrl } from '../utils/baseUrl';
 
 export const createRandomUserApiCall = async (numberOfUser = 0) => {
-  let url = `${
-    process.env.API_USER_URL || `http://localhost:9000`
-  }/v1/generate/users/random/${numberOfUser}`;
+  let url = `${getUserApiBaseUrl()}/v1/generate/users/random/${numberOfUser}`;
   const config = {
     method: 'get',
     url: url,
