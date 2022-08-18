@@ -17,5 +17,6 @@ export const radiusCacheHandler = async (key, exp, dataStoreFn) => {
       EX: exp,
     });
   }
+  await client.disconnect();
   return JSON.parse(cacheData);
 };

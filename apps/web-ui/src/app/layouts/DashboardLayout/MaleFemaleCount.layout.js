@@ -25,7 +25,7 @@ export default function MaleFemaleCountLayout() {
     ['getTotalGenderCounter'],
     getTotalGenderCounterApiCall,
     {
-      refetchInterval: 5000,
+      refetchInterval: 1000,
     }
   );
 

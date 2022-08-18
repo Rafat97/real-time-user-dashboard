@@ -234,20 +234,22 @@ userRoutes.getMethod('/agg/all/:fieldName', async (req, res) => {
   const cacheKey = hash({
     url: req.originalUrl,
   });
-  const cacheTime = 10;
+  const cacheTime = 1;
   const returnData = await radiusCacheHandler(cacheKey, cacheTime, async () => {
-    const agg = await UserModel.aggregate([
-      {
-        $group: {
-          _id: `$${fieldName}`,
-          sum: { $sum: 1 },
-        },
-      },
-      { $sort: { sum: -1 } },
-      { $count: 'sum' },
-    ]);
+    // takes 7s
+    // const agg = await UserModel.aggregate([
+    //   {
+    //     $group: {
+    //       _id: `$${fieldName}`,
+    //       sum: { $sum: 1 },
+    //     },
+    //   },
+    //   { $sort: { sum: -1 } },
+    //   { $count: 'sum' },
+    // ]);
+    const agg = await UserModel.distinct(`${fieldName}`);
     return {
-      allCountry: agg[0]?.sum || 0,
+      allCountry: agg.length || 0,
     };
   });
 

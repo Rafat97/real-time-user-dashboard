@@ -5,6 +5,7 @@ export const redisConnectionCheck = async (connectionOption) => {
   const client = createClient({ ...connectionOption });
   await client.connect();
   console.log('redis connect successfully');
+  await client.disconnect()
   return client;
 };
 

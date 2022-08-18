@@ -27,7 +27,7 @@ export default function TopActiveUserCountLayout() {
     Top15UserCounterApiCall,
     {
       initialData: [],
-      refetchInterval: 5000,
+      refetchInterval: 1000,
     }
   );
 

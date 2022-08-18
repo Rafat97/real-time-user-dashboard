@@ -27,7 +27,7 @@ export default function TopCountryCountLayout() {
     allTop15CountryCounterApiCall,
     {
       initialData: [],
-      refetchInterval: 5000,
+      refetchInterval: 1000,
     }
   );
 
