@@ -53,6 +53,7 @@ graph TD;
     zookeeper --> 
     kafka -->
     user-create-consumer(User Consumer For kafka) --> 
+    user-schedule(User schedule) --> 
     user(User Service) -->
     web-ui(React Web UI) -->
     management-mongo(Mongo Express);
