@@ -1,10 +1,9 @@
 import axios from 'axios';
+import { getUserApiBaseUrl } from '../utils/baseUrl';
 
 export const userDeleteApiCall = async (id) => {
   try {
-    let url = `${
-      process.env.API_USER_URL || `http://localhost:9000`
-    }/v1/user/${id}`;
+    let url = `${getUserApiBaseUrl()}/v1/user/${id}`;
     const config = {
       method: 'delete',
       url: url,

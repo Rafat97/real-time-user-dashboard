@@ -1,10 +1,9 @@
 import axios from 'axios';
+import { getUserApiBaseUrl } from '../utils/baseUrl';
 
 export const updateUserInfoApiCall = async (userInput) => {
   const id = userInput._id;
-  let url = `${
-    process.env.API_USER_URL || `http://localhost:9000`
-  }/v1/user/${id}`;
+  let url = `${getUserApiBaseUrl()}/v1/user/${id}`;
   const input = JSON.stringify({
     ...userInput,
   });
@@ -12,7 +11,7 @@ export const updateUserInfoApiCall = async (userInput) => {
     method: 'post',
     url: url,
     headers: { 'Content-Type': 'application/json' },
-    data: userInput,
+    data: input,
   };
   const data = await axios(config);
   return data.data.result;

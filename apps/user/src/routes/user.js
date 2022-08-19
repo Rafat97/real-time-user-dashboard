@@ -4,12 +4,19 @@ import { USER_EVENT } from '@myapp/event';
 import { BadRequestValidation } from '@rafat97/exceptionhandler';
 import {
   createUser,
+  getDailyActiveUser,
+  getGenderAggregation,
+  getMonthActiveUser,
+  getTop15Users,
+  getUserActivateCounter,
+  getUserActivateDeviceAggregation,
+  getUserCountryAggregation,
+  getUserEstimateCounter,
+  getWeeklyActiveUser,
   updateUserInfo,
-  UserActivityModel,
   UserModel,
 } from '@myapp/app-models';
 import { appConfig } from '@myapp/app-config';
-import { convertToInternationalCurrencySystem } from '@myapp/utils';
 import { radiusCacheHandler } from '../utils/radisHandler';
 import * as hash from 'object-hash';
 import { inputValidation } from '../middleware/inputValidation';
@@ -76,12 +83,8 @@ userRoutes.getMethod('/admin/count', async (req, res) => {
     url: req.originalUrl,
   });
   const getCount = await radiusCacheHandler(cacheKey, 5, async () => {
-    const countDocument = await UserModel.estimatedDocumentCount();
-    return {
-      count: countDocument,
-      countInternationalSystem:
-        convertToInternationalCurrencySystem(countDocument),
-    };
+    const countDocument = await getUserEstimateCounter();
+    return countDocument;
   });
   res.status(200).send({
     result: getCount,
@@ -231,20 +234,22 @@ userRoutes.getMethod('/agg/all/:fieldName', async (req, res) => {
   const cacheKey = hash({
     url: req.originalUrl,
   });
-  const cacheTime = 10;
+  const cacheTime = 1;
   const returnData = await radiusCacheHandler(cacheKey, cacheTime, async () => {
-    const agg = await UserModel.aggregate([
-      {
-        $group: {
-          _id: `$${fieldName}`,
-          sum: { $sum: 1 },
-        },
-      },
-      { $sort: { sum: -1 } },
-      { $count: 'sum' },
-    ]);
+    // takes 7s
+    // const agg = await UserModel.aggregate([
+    //   {
+    //     $group: {
+    //       _id: `$${fieldName}`,
+    //       sum: { $sum: 1 },
+    //     },
+    //   },
+    //   { $sort: { sum: -1 } },
+    //   { $count: 'sum' },
+    // ]);
+    const agg = await UserModel.distinct(`${fieldName}`);
     return {
-      allCountry: agg[0]?.sum || 0,
+      allCountry: agg.length || 0,
     };
   });
 
@@ -260,19 +265,8 @@ userRoutes.getMethod('/agg/country', async (req, res) => {
   });
   const cacheTime = 10;
   const returnData = await radiusCacheHandler(cacheKey, cacheTime, async () => {
-    const agg = await UserModel.aggregate([
-      {
-        $group: {
-          _id: `$country`,
-          sum: { $sum: 1 },
-        },
-      },
-      { $sort: { sum: -1 } },
-      { $limit: 15 },
-      { $addFields: { country: '$_id' } },
-      { $project: { _id: 0 } },
-    ]);
-    return agg;
+    const aggResult = await getUserCountryAggregation();
+    return aggResult;
   });
 
   res.status(200).send({
@@ -286,51 +280,8 @@ userRoutes.getMethod('/agg/gender', async (req, res) => {
   });
   const cacheTime = 10;
   const returnData = await radiusCacheHandler(cacheKey, cacheTime, async () => {
-    // it takes 7s
-    // const agg = await UserModel.aggregate([
-    //   {
-    //     $group: {
-    //       _id: `$${fieldName}`,
-    //       sum: { $sum: 1 },
-    //     },
-    //   },
-    //   { $limit: 15 },
-    //   { $sort: { sum: -1 } },
-    // ]);
-    const agg = await UserModel.aggregate([
-      {
-        $match: {
-          gender: { $eq: 'male' },
-        },
-      },
-      {
-        $group: {
-          _id: `$gender`,
-          sum: { $count: {} },
-        },
-      },
-      { $sort: { sum: -1 } },
-    ]);
-
-    const agg2 = await UserModel.aggregate([
-      {
-        $match: {
-          gender: { $eq: 'female' },
-        },
-      },
-      {
-        $group: {
-          _id: `$gender`,
-          sum: { $count: {} },
-        },
-      },
-      { $sort: { sum: -1 } },
-    ]);
-    const out = {
-      male: agg[0]?.sum || 0,
-      female: agg2[0]?.sum || 0,
-    };
-    return out;
+    const getGenderAgg = await getGenderAggregation();
+    return getGenderAgg;
   });
 
   res.status(200).send({
@@ -344,38 +295,8 @@ userRoutes.getMethod('/agg/device', async (req, res) => {
   });
   const cacheTime = 1;
   const returnData = await radiusCacheHandler(cacheKey, cacheTime, async () => {
-    const agg = await UserActivityModel.aggregate([
-      {
-        $facet: {
-          deviceOsName: [
-            {
-              $group: {
-                _id: `$device.os.name`,
-                sum: { $sum: 1 },
-              },
-            },
-            { $sort: { sum: -1 } },
-            { $addFields: { name: '$_id' } },
-            { $project: { _id: 0 } },
-            { $limit: 5 },
-          ],
-          deviceBrowserName: [
-            {
-              $group: {
-                _id: `$device.browser.name`,
-                sum: { $sum: 1 },
-              },
-            },
-            { $sort: { sum: -1 } },
-            { $addFields: { name: '$_id' } },
-            { $project: { _id: 0 } },
-            { $limit: 5 },
-          ],
-        },
-      },
-    ]);
-
-    return agg[0];
+    const aggData = await getUserActivateDeviceAggregation();
+    return aggData;
   });
 
   res.status(200).send({
@@ -389,12 +310,8 @@ userRoutes.getMethod('/stat/count/totalRequest', async (req, res) => {
     url: req.originalUrl,
   });
   const getCount = await radiusCacheHandler(cacheKey, 2, async () => {
-    const countDocument = await UserActivityModel.estimatedDocumentCount();
-    return {
-      count: countDocument,
-      countInternationalSystem:
-        convertToInternationalCurrencySystem(countDocument),
-    };
+    const countDocument = await getUserActivateCounter();
+    return countDocument;
   });
   res.status(200).send({
     result: getCount,
@@ -407,27 +324,7 @@ userRoutes.getMethod('/stat/top-15-user', async (req, res) => {
     url: req.originalUrl,
   });
   const getUser = await radiusCacheHandler(cacheKey, 10, async () => {
-    const agg = await UserActivityModel.aggregate([
-      {
-        $group: {
-          _id: '$user',
-          sum: { $sum: 1 },
-        },
-      },
-      { $sort: { sum: -1 } },
-      { $limit: 15 },
-      { $addFields: { user: '$_id' } },
-      { $project: { _id: 0 } },
-    ]);
-    const returnData = [];
-    for (let index = 0; index < agg.length; index++) {
-      const element = agg[index].user;
-      const userInfo = await UserModel.findById(element).select('-__v');
-      returnData.push({
-        user: userInfo,
-        sum: agg[index].sum,
-      });
-    }
+    const returnData = await getTop15Users();
     return returnData;
   });
 
@@ -442,52 +339,13 @@ userRoutes.getMethod('/stat/dau', async (req, res) => {
     url: req.originalUrl,
   });
 
-  const dateFrom = new Date();
-  const dateTo = new Date(new Date().setDate(dateFrom.getDate() + 1));
-
-  let returnData = await UserActivityModel.aggregate([
-    {
-      $match: {
-        requestTime: {
-          $gte: new Date(
-            dateFrom.getFullYear(),
-            dateFrom.getMonth(),
-            dateFrom.getDate()
-          ),
-          $lt: new Date(
-            dateTo.getFullYear(),
-            dateTo.getMonth(),
-            dateTo.getDate()
-          ),
-        },
-      },
-    },
-    {
-      $group: {
-        _id: {
-          user: '$user',
-          ymd: { $dateToString: { format: '%Y-%m-%d', date: '$requestTime' } },
-        },
-      },
-    },
-    { $group: { _id: '$_id.ymd', au: { $count: {} } } },
-    { $addFields: { time: '$_id' } },
-    { $project: { _id: 0 } },
-    { $sort: { au: -1 } },
-    {
-      $group: {
-        _id: null,
-        total: {
-          $sum: '$au',
-        },
-      },
-    },
-    { $project: { _id: 0 } },
-  ]);
-  returnData = { totalDailyActiveUser: returnData[0]?.total || 0 };
+  const getDailyActUser = await radiusCacheHandler(cacheKey, 5, async () => {
+    const returnData = await getDailyActiveUser();
+    return returnData;
+  });
 
   res.status(200).send({
-    result: returnData,
+    result: getDailyActUser,
   });
 });
 
@@ -497,52 +355,13 @@ userRoutes.getMethod('/stat/wau', async (req, res) => {
     url: req.originalUrl,
   });
 
-  const dateFrom = new Date();
-  const dateTo = new Date(new Date().setDate(dateFrom.getDate() + 7));
-
-  let returnData = await UserActivityModel.aggregate([
-    {
-      $match: {
-        requestTime: {
-          $gte: new Date(
-            dateFrom.getFullYear(),
-            dateFrom.getMonth(),
-            dateFrom.getDate()
-          ),
-          $lt: new Date(
-            dateTo.getFullYear(),
-            dateTo.getMonth(),
-            dateTo.getDate()
-          ),
-        },
-      },
-    },
-    {
-      $group: {
-        _id: {
-          user: '$user',
-          ymd: { $dateToString: { format: '%Y-%m-%d', date: '$requestTime' } },
-        },
-      },
-    },
-    { $group: { _id: '$_id.ymd', au: { $count: {} } } },
-    { $addFields: { time: '$_id' } },
-    { $project: { _id: 0 } },
-    { $sort: { au: -1 } },
-    {
-      $group: {
-        _id: null,
-        total: {
-          $sum: '$au',
-        },
-      },
-    },
-    { $project: { _id: 0 } },
-  ]);
-  returnData = { totalWeeklyActiveUser: returnData[0]?.total || 0 };
+  const getWeekActUser = await radiusCacheHandler(cacheKey, 5, async () => {
+    const returnData = await getWeeklyActiveUser();
+    return returnData;
+  });
 
   res.status(200).send({
-    result: returnData,
+    result: getWeekActUser,
   });
 });
 
@@ -552,44 +371,13 @@ userRoutes.getMethod('/stat/mau', async (req, res) => {
     url: req.originalUrl,
   });
 
-  const dateFrom = new Date();
-  const dateTo = new Date(new Date().setDate(dateFrom.getDate() + 31));
-
-  let returnData = await UserActivityModel.aggregate([
-    {
-      $match: {
-        requestTime: {
-          $gte: new Date(dateFrom.getFullYear(), dateFrom.getMonth()),
-          $lt: new Date(dateTo.getFullYear(), dateTo.getMonth()),
-        },
-      },
-    },
-    {
-      $group: {
-        _id: {
-          user: '$user',
-          ymd: { $dateToString: { format: '%Y-%m-%d', date: '$requestTime' } },
-        },
-      },
-    },
-    { $group: { _id: '$_id.ymd', au: { $count: {} } } },
-    { $addFields: { time: '$_id' } },
-    { $project: { _id: 0 } },
-    { $sort: { au: -1 } },
-    {
-      $group: {
-        _id: null,
-        total: {
-          $sum: '$au',
-        },
-      },
-    },
-    { $project: { _id: 0 } },
-  ]);
-  returnData = { totalMonthlyActiveUser: returnData[0]?.total || 0 };
+  const getMonthActUser = await radiusCacheHandler(cacheKey, 5, async () => {
+    const returnData = await getMonthActiveUser();
+    return returnData;
+  });
 
   res.status(200).send({
-    result: returnData,
+    result: getMonthActUser,
   });
 });
 

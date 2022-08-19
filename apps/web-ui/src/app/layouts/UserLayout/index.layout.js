@@ -211,7 +211,7 @@ export default function UserLayout() {
       keepPreviousData: true,
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
-      refetchInterval: 3000,
+      refetchInterval: 1000,
     }
   );
 

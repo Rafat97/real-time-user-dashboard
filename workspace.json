@@ -11,6 +11,7 @@
     "app-utils": "libs/app-utils",
     "user": "apps/user",
     "user-create-consumer": "apps/user-create-consumer",
+    "user-schedule": "apps/user-schedule",
     "web-ui": "apps/web-ui"
   }
 }
